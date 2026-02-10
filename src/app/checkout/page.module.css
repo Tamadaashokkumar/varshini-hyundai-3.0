@@ -1,0 +1,465 @@
+/* src/app/checkout/page.module.css */
+
+.container {
+  min-height: 100vh;
+  padding: 6rem 2rem 4rem;
+  background: linear-gradient(180deg, #0A0E27 0%, #001a3d 100%);
+}
+
+/* Header */
+.header {
+  max-width: 1400px;
+  margin: 0 auto 3rem;
+  text-align: center;
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: white;
+  font-family: var(--font-display);
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Content Layout */
+.content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 450px;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.section {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 2rem;
+}
+
+/* Payment Methods */
+.paymentMethods {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .paymentMethods {
+    grid-template-columns: 1fr;
+  }
+}
+
+.paymentCard {
+  position: relative;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.paymentCard:hover {
+  border-color: rgba(0, 170, 210, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.paymentCardSelected {
+  border-color: #00AAD2;
+  background: rgba(0, 170, 210, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 170, 210, 0.2);
+}
+
+.paymentSelectedBadge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: #00AAD2;
+}
+
+.paymentTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.paymentDescription {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+}
+
+/* Address Section */
+.addressSection {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 2rem;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: white;
+  font-family: var(--font-display);
+}
+
+/* No Addresses */
+.noAddresses {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.addAddressButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #00AAD2 0%, #002C5F 100%);
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(0, 170, 210, 0.3);
+}
+
+.addAddressButton:hover {
+  box-shadow: 0 12px 32px rgba(0, 170, 210, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Address List */
+.addressList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.addressCard {
+  position: relative;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.addressCard:hover {
+  border-color: rgba(0, 170, 210, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(4px);
+}
+
+.addressCardSelected {
+  border-color: #00AAD2;
+  background: rgba(0, 170, 210, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 170, 210, 0.2);
+}
+
+.selectedBadge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: #00AAD2;
+}
+
+.addressType {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #00AAD2;
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+}
+
+.defaultBadge {
+  margin-left: auto;
+  padding: 0.25rem 0.75rem;
+  background: rgba(0, 170, 210, 0.2);
+  border: 1px solid rgba(0, 170, 210, 0.5);
+  border-radius: 50px;
+  font-size: 0.75rem;
+}
+
+.addressDetails {
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.8;
+}
+
+.addressDetails p {
+  margin: 0;
+}
+
+/* Add New Button */
+.addNewButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.addNewButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(0, 170, 210, 0.5);
+  color: #00AAD2;
+}
+
+/* Order Summary */
+.orderSummary {
+  position: sticky;
+  top: 6rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 2rem;
+}
+
+.summaryTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: white;
+  font-family: var(--font-display);
+  margin-bottom: 1.5rem;
+}
+
+/* Items Preview */
+.itemsPreview {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.itemsCount {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.itemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.itemRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.itemName {
+  color: rgba(255, 255, 255, 0.8);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 1rem;
+}
+
+.itemPrice {
+  color: white;
+  font-weight: 600;
+}
+
+.moreItems {
+  color: #00AAD2;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+/* Price Breakdown */
+.priceBreakdown {
+  margin-bottom: 1.5rem;
+}
+
+.priceRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.priceLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+}
+
+.priceValue {
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 170, 210, 0.5), transparent);
+  margin: 1rem 0;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: white;
+}
+
+.totalAmount {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #00AAD2;
+  font-family: var(--font-display);
+}
+
+/* Payment Button */
+.paymentButton {
+  width: 100%;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, #00AAD2 0%, #002C5F 100%);
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(0, 170, 210, 0.3);
+  margin-bottom: 1rem;
+}
+
+.paymentButton:hover:not(:disabled) {
+  box-shadow: 0 12px 32px rgba(0, 170, 210, 0.4);
+  transform: translateY(-2px);
+}
+
+.paymentButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Security Badge */
+.securityBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Light mode */
+:global(.light) .container {
+  background: linear-gradient(180deg, #f0f4f8 0%, #ffffff 100%);
+}
+
+:global(.light) .addressSection,
+:global(.light) .orderSummary {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+:global(.light) .title,
+:global(.light) .sectionTitle,
+:global(.light) .summaryTitle,
+:global(.light) .totalRow,
+:global(.light) .itemPrice,
+:global(.light) .priceValue {
+  color: #0A0E27;
+}
+
+:global(.light) .subtitle,
+:global(.light) .itemsCount,
+:global(.light) .itemName,
+:global(.light) .priceLabel {
+  color: rgba(10, 14, 39, 0.7);
+}
+
+:global(.light) .addressDetails {
+  color: rgba(10, 14, 39, 0.8);
+}
+
+:global(.light) .addressCard {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+:global(.light) .addressCard:hover {
+  background: rgba(0, 0, 0, 0.04);
+}

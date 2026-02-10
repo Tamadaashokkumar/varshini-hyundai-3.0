@@ -1,0 +1,432 @@
+/* src/app/products/[id]/page.module.css */
+
+.container {
+  min-height: 100vh;
+  padding: 8rem 2rem 4rem;
+  background: linear-gradient(180deg, #0A0E27 0%, #001a3d 100%);
+}
+
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  margin-bottom: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50px;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(0, 170, 210, 0.5);
+  transform: translateX(-4px);
+}
+
+.productContainer {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .productContainer {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+}
+
+/* Image Section */
+.imageSection {
+  position: sticky;
+  top: 6rem;
+}
+
+.mainImageContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.mainImage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
+}
+
+.noImage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.discountBadge {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #D4AF37 0%, #FFD700 100%);
+  color: #000;
+  font-weight: 700;
+  font-size: 1rem;
+  border-radius: 50px;
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
+  z-index: 10;
+}
+
+.thumbnailContainer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.thumbnail {
+  position: relative;
+  aspect-ratio: 1;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.thumbnail:hover {
+  border-color: rgba(0, 170, 210, 0.5);
+  transform: translateY(-2px);
+}
+
+.thumbnailActive {
+  border-color: #00AAD2;
+  box-shadow: 0 4px 12px rgba(0, 170, 210, 0.3);
+}
+
+/* Details Section */
+.detailsSection {
+  color: white;
+}
+
+.partNumber {
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  color: #00AAD2;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.productName {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  font-family: var(--font-display);
+}
+
+@media (max-width: 768px) {
+  .productName {
+    font-size: 1.875rem;
+  }
+}
+
+.priceContainer {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.currentPrice {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #00AAD2;
+  font-family: var(--font-display);
+}
+
+.originalPrice {
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: line-through;
+}
+
+.savingsText {
+  font-size: 0.875rem;
+  color: #4ade80;
+  font-weight: 600;
+}
+
+.compatibleModels {
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.modelBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.modelBadge {
+  padding: 0.5rem 1rem;
+  background: rgba(0, 170, 210, 0.1);
+  border: 1px solid rgba(0, 170, 210, 0.3);
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #00AAD2;
+}
+
+.description {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+}
+
+.descriptionText {
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+}
+
+.specifications {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+}
+
+.specGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .specGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.specItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+}
+
+.specKey {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+}
+
+.specValue {
+  font-weight: 600;
+  color: white;
+  font-size: 0.875rem;
+}
+
+.warranty {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  background: rgba(0, 170, 210, 0.1);
+  border: 1px solid rgba(0, 170, 210, 0.3);
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.quantitySelector {
+  margin-bottom: 2rem;
+}
+
+.quantityControls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.quantityButton {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.quantityButton:hover:not(:disabled) {
+  background: rgba(0, 170, 210, 0.2);
+  border-color: #00AAD2;
+}
+
+.quantityButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.quantityValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  min-width: 3rem;
+  text-align: center;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.addToCartButton {
+  flex: 1;
+  padding: 1.25rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, #00AAD2 0%, #002C5F 100%);
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(0, 170, 210, 0.3);
+}
+
+.addToCartButton:hover:not(:disabled) {
+  box-shadow: 0 12px 32px rgba(0, 170, 210, 0.4);
+  transform: translateY(-2px);
+}
+
+.addToCartButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.iconButton {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.iconButton:hover {
+  background: rgba(0, 170, 210, 0.2);
+  border-color: #00AAD2;
+  color: #00AAD2;
+}
+
+.trustBadges {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+}
+
+@media (max-width: 768px) {
+  .trustBadges {
+    grid-template-columns: 1fr;
+  }
+}
+
+.trustBadge {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #00AAD2;
+}
+
+.trustTitle {
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: white;
+}
+
+.trustSubtitle {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Light mode */
+:global(.light) .container {
+  background: linear-gradient(180deg, #f0f4f8 0%, #ffffff 100%);
+}
+
+:global(.light) .backButton,
+:global(.light) .mainImageContainer,
+:global(.light) .thumbnail,
+:global(.light) .description,
+:global(.light) .specifications,
+:global(.light) .trustBadges {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+:global(.light) .detailsSection,
+:global(.light) .productName,
+:global(.light) .trustTitle,
+:global(.light) .specValue {
+  color: #0A0E27;
+}
+
+:global(.light) .descriptionText,
+:global(.light) .specKey {
+  color: rgba(10, 14, 39, 0.7);
+}

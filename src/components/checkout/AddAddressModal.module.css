@@ -1,0 +1,213 @@
+/* src/components/checkout/AddAddressModal.module.css */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: rgba(10, 14, 39, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  z-index: 101;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  font-family: var(--font-display);
+}
+
+.closeButton {
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
+}
+
+/* Form */
+.form {
+  padding: 2rem;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: white;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: #00AAD2;
+  box-shadow: 0 0 0 3px rgba(0, 170, 210, 0.1);
+}
+
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.select {
+  cursor: pointer;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 640px) {
+  .actions {
+    flex-direction: column-reverse;
+  }
+}
+
+.cancelButton,
+.submitButton {
+  flex: 1;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancelButton {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.cancelButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.submitButton {
+  background: linear-gradient(135deg, #00AAD2 0%, #002C5F 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 170, 210, 0.3);
+}
+
+.submitButton:hover:not(:disabled) {
+  box-shadow: 0 8px 24px rgba(0, 170, 210, 0.4);
+  transform: translateY(-2px);
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Light mode */
+:global(.light) .modal {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+:global(.light) .title {
+  color: #0A0E27;
+}
+
+:global(.light) .label {
+  color: rgba(10, 14, 39, 0.9);
+}
+
+:global(.light) .input,
+:global(.light) .select {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #0A0E27;
+}
+
+:global(.light) .input::placeholder {
+  color: rgba(10, 14, 39, 0.4);
+}
+
+:global(.light) .closeButton {
+  background: rgba(0, 0, 0, 0.05);
+  color: #0A0E27;
+}
+
+:global(.light) .closeButton:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+:global(.light) .cancelButton {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #0A0E27;
+}
+
+:global(.light) .cancelButton:hover {
+  background: rgba(0, 0, 0, 0.1);
+}

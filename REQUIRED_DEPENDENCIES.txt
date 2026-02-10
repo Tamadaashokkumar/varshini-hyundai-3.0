@@ -1,0 +1,14 @@
+# Frontend Dependencies to Install
+
+Run this command in your frontend directory:
+
+npm install socket.io-client lucide-react
+
+# Verify these are already installed:
+# - next
+# - react
+# - react-dom
+# - tailwindcss
+
+# If any are missing, install them:
+npm install next react react-dom tailwindcss

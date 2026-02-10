@@ -1,0 +1,212 @@
+/* src/components/ProductCard.module.css */
+
+.card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 170, 210, 0.1) 0%, rgba(0, 44, 95, 0.1) 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.card:hover {
+  border-color: rgba(0, 170, 210, 0.5);
+  box-shadow: 
+    0 20px 60px rgba(0, 170, 210, 0.2),
+    0 0 40px rgba(0, 170, 210, 0.1),
+    inset 0 0 0 1px rgba(0, 170, 210, 0.1);
+  transform: translateY(-4px);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.glow {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  right: -50%;
+  bottom: -50%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 170, 210, 0.15) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(0, 44, 95, 0.3) 0%, rgba(0, 170, 210, 0.2) 100%);
+}
+
+.imageContainer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  pointer-events: none;
+}
+
+.quickActions {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.actionButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #002C5F;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.actionButton:hover {
+  background: #00AAD2;
+  color: white;
+  box-shadow: 0 8px 16px rgba(0, 170, 210, 0.3);
+}
+
+.content {
+  padding: 20px;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+  transition: color 0.3s ease;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.8rem;
+}
+
+:global(.dark) .title {
+  color: #ffffff;
+}
+
+.card:hover .title {
+  color: #00AAD2;
+}
+
+.addToCartButton {
+  width: 100%;
+  padding: 12px 24px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00AAD2 0%, #002C5F 100%);
+  color: white;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  margin-top: auto;
+}
+
+.addToCartButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.addToCartButton:hover::before {
+  left: 100%;
+}
+
+.addToCartButton:hover {
+  box-shadow: 0 8px 24px rgba(0, 170, 210, 0.4);
+  transform: translateY(-2px);
+}
+
+.addToCartButton:disabled {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.addToCartButton:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Shimmer loading effect */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+}

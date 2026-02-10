@@ -1,0 +1,353 @@
+/* src/app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-inter: "Inter", system-ui, sans-serif;
+  --font-orbitron: "Orbitron", system-ui, sans-serif;
+
+  /* Light theme colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f0f4f8;
+  --text-primary: #0a0e27;
+  --text-secondary: #6b7280;
+}
+
+.dark {
+  /* Dark theme colors */
+  --bg-primary: #0a0e27;
+  --bg-secondary: #001a3d;
+  --text-primary: #ffffff;
+  --text-secondary: #9ca3af;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+html {
+  /* Scrollbar కి ముందే స్పేస్ రిజర్వ్ చేస్తుంది, కాబట్టి పేజీ కదలదు */
+  scrollbar-gutter: stable;
+  overflow-y: scroll !important;
+}
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  font-family: var(--font-inter);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+@layer base {
+  body {
+    @apply bg-[#050B14] text-white; /* Mee Dark Theme Background Color */
+  }
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #00aad2 0%, #002c5f 100%);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #002c5f 0%, #00aad2 100%);
+}
+
+/* Selection */
+::selection {
+  background: rgba(0, 170, 210, 0.3);
+  color: white;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Utility classes */
+.animate-fadeIn {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.6s ease-out;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-light {
+  background: rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #00aad2 0%, #002c5f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glow {
+  box-shadow: 0 0 20px rgba(0, 170, 210, 0.5);
+}
+
+.glow-hover:hover {
+  box-shadow: 0 0 30px rgba(0, 170, 210, 0.7);
+}
+
+/* Button base styles */
+.btn {
+  @apply px-6 py-3 rounded-lg font-semibold transition-all duration-300;
+  @apply inline-flex items-center justify-center gap-2;
+  @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.btn-primary {
+  @apply bg-gradient-to-r from-hyundai-blue to-hyundai-midnight;
+  @apply text-white hover:shadow-lg;
+  @apply focus:ring-hyundai-blue;
+}
+
+.btn-secondary {
+  @apply bg-white/10 backdrop-blur-sm border border-white/20;
+  @apply text-white hover:bg-white/20;
+}
+
+.btn-ghost {
+  @apply bg-transparent hover:bg-white/10;
+  @apply text-white;
+}
+
+/* Input styles */
+.input {
+  @apply w-full px-4 py-3 rounded-lg;
+  @apply bg-white/5 backdrop-blur-sm;
+  @apply border border-white/10;
+  @apply text-white placeholder:text-white/40;
+  @apply focus:outline-none focus:border-hyundai-blue;
+  @apply transition-all duration-300;
+}
+
+.light .input {
+  @apply bg-black/[0.03] border-black/10;
+  @apply text-black placeholder:text-black/40;
+}
+
+/* Card styles */
+.card {
+  @apply bg-white/5 backdrop-blur-sm;
+  @apply border border-white/10;
+  @apply rounded-2xl p-6;
+  @apply transition-all duration-300;
+}
+
+.light .card {
+  @apply bg-black/[0.03] border-black/10;
+}
+
+.card-hover {
+  @apply hover:border-hyundai-blue/50;
+  @apply hover:shadow-lg hover:shadow-hyundai-blue/20;
+  @apply hover:-translate-y-1;
+}
+
+/* Loading skeleton */
+.skeleton {
+  @apply animate-pulse bg-gradient-to-r;
+  @apply from-white/5 via-white/10 to-white/5;
+  @apply rounded;
+}
+
+.light .skeleton {
+  @apply from-black/5 via-black/10 to-black/5;
+}
+
+/* Badge styles */
+.badge {
+  @apply inline-flex items-center gap-1;
+  @apply px-3 py-1 rounded-full;
+  @apply text-xs font-semibold;
+}
+
+.badge-primary {
+  @apply bg-hyundai-blue/20 text-hyundai-blue;
+  @apply border border-hyundai-blue/30;
+}
+
+.badge-success {
+  @apply bg-green-500/20 text-green-400;
+  @apply border border-green-500/30;
+}
+
+.badge-warning {
+  @apply bg-orange-500/20 text-orange-400;
+  @apply border border-orange-500/30;
+}
+
+.badge-danger {
+  @apply bg-red-500/20 text-red-400;
+  @apply border border-red-500/30;
+}
+
+/* Page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+
+.page-exit {
+  opacity: 1;
+}
+
+.page-exit-active {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .show-mobile {
+    display: none !important;
+  }
+}
+
+/* src/app/globals.css */
+
+@layer utilities {
+  /* 🔥 Animation Keyframes (Movement Logic) */
+  @keyframes gradient-move {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  /* 🔥 Light Mode Gradient (10 Beautiful Colors) */
+  .animate-gradient-light {
+    background: linear-gradient(
+      -45deg,
+      #ee7752,
+      #e73c7e,
+      #23a6d5,
+      #23d5ab,
+      #ff9a9e,
+      #fad0c4,
+      #a18cd1,
+      #fbc2eb,
+      #84fab0,
+      #8fd3f4
+    );
+    background-size: 400% 400%;
+    animation: gradient-move 15s ease infinite;
+  }
+
+  /* 🔥 Dark Mode Gradient (10 Deep Space Colors) */
+  .dark .animate-gradient-dark {
+    background: linear-gradient(
+      -45deg,
+      #020617,
+      #0f172a,
+      #1e1b4b,
+      #312e81,
+      #4c1d95,
+      #581c87,
+      #701a75,
+      #831843,
+      #be185d,
+      #0f172a
+    );
+    background-size: 400% 400%;
+    animation: gradient-move 15s ease infinite;
+  }
+}
