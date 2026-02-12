@@ -239,7 +239,7 @@
 //             new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
 //         );
 //         setMessages(historyData);
-//         socket?.emit("mark_read", { roomId });
+//         socketService.emit("mark_read", { roomId });
 //       }
 //     } catch (error) {
 //       console.error("Failed to fetch history", error);
@@ -275,7 +275,7 @@
 //     if (!fileData && !textToSend.trim()) return;
 
 //     if (editingMessageId && !fileData) {
-//       socket?.emit("edit_message", {
+//       socketService.emit("edit_message", {
 //         roomId,
 //         messageId: editingMessageId,
 //         newText: textToSend,
@@ -305,14 +305,14 @@
 //       tempId: Date.now(),
 //     };
 
-//     socket?.emit("send_message", messagePayload);
+//     socketService.emit("send_message", messagePayload);
 //     playSound("send");
 
 //     if (!fileData) setInputText("");
 //     setPreviewImage(null);
 //     setCaptionText("");
 //     setSelectedFile(null);
-//     socket?.emit("stop_typing", { roomId });
+//     socketService.emit("stop_typing", { roomId });
 //   };
 
 //   const handleFileSelect = (e) => {
@@ -362,7 +362,7 @@
 
 //   const confirmDelete = () => {
 //     if (deleteConfirmationId) {
-//       socket?.emit("delete_message", {
+//       socketService.emit("delete_message", {
 //         roomId,
 //         messageId: deleteConfirmationId,
 //       });
@@ -372,10 +372,10 @@
 //   };
 
 //   const handleTyping = () => {
-//     if (!typingTimeoutRef.current) socket?.emit("typing", { roomId });
+//     if (!typingTimeoutRef.current) socketService.emit("typing", { roomId });
 //     clearTimeout(typingTimeoutRef.current);
 //     typingTimeoutRef.current = setTimeout(() => {
-//       socket?.emit("stop_typing", { roomId });
+//       socketService.emit("stop_typing", { roomId });
 //       typingTimeoutRef.current = null;
 //     }, 800);
 //   };
@@ -960,8 +960,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
-import io from "socket.io-client";
-import axios from "axios";
+
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast"; // 🔥 NEW: Toast Import
@@ -992,6 +991,9 @@ import {
   Clock, // New Icon for pending state
 } from "lucide-react";
 
+import socketService from "@/services/socketService";
+import apiClient from "@/services/apiClient";
+
 // --- SOUND ASSETS ---
 const SEND_SOUND_URL = "/sounds/message-send.mp3";
 const RECEIVE_SOUND_URL = "/sounds/message-receive.mp3";
@@ -1002,11 +1004,10 @@ export default function ChatComponent({
   currentUserId,
   otherUserId,
   otherUserModel = "Admin",
-  token,
   apiUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000",
 }) {
   // --- STATE ---
-  const [socket, setSocket] = useState(null);
+
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState("");
   const [otherUserTyping, setOtherUserTyping] = useState(false);
@@ -1049,6 +1050,8 @@ export default function ChatComponent({
 
   // Room ID Logic
   const roomId = [currentUserId, otherUserId].sort().join("_");
+
+  console.log("rooooom Id ", roomId);
 
   // --- THEME & SOUND ---
   useEffect(() => {
@@ -1095,68 +1098,192 @@ export default function ChatComponent({
     }
   }, [messages, otherUserTyping, selectedFile]);
 
-  // --- SOCKET CONNECTION ---
+  // 🔥 FIX 1: Fetch History Independently (Not dependent on socket connection)
   useEffect(() => {
-    if (!token || !currentUserId || !otherUserId) return;
-
-    const socketUrl = apiUrl.replace("/api", "");
-    const newSocket = io(socketUrl, {
-      auth: { token },
-      withCredentials: true,
-      transports: ["websocket", "polling"],
-    });
-
-    setSocket(newSocket);
-
-    newSocket.on("connect", () => {
-      newSocket.emit("join_room", { roomId });
-      newSocket.emit("check_online_status", { userId: otherUserId });
-      // Reset pagination on fresh connect
-      setPage(1);
-      setHasMore(true);
+    if (roomId) {
       fetchChatHistory(1);
-    });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomId]);
 
-    newSocket.on("is_user_online_response", (data) => {
+  // --- SOCKET CONNECTION ---
+  // 👇 REPLACE YOUR OLD SOCKET useEffect WITH THIS:
+
+  // useEffect(() => {
+  //   if (!currentUserId || !otherUserId) return;
+
+  //   // 1. Connect using Singleton Service
+  //   socketService.connect();
+
+  //   // 2. Join Room & Check Status
+  //   socketService.emit("join_room", { roomId });
+  //   socketService.emit("check_online_status", { userId: otherUserId });
+
+  //   // 3. Register Listeners (capture unsubscribe functions)
+  //   const unsubOnline = socketService.on("is_user_online_response", (data) => {
+  //     if (String(data.userId) === String(otherUserId)) {
+  //       setOnlineStatus(data.isOnline ? "online" : "offline");
+  //     }
+  //   });
+
+  //   const unsubStatus = socketService.on("user_status_update", (data) => {
+  //     if (String(data.userId) === String(otherUserId)) {
+  //       setOnlineStatus(data.isOnline ? "online" : "offline");
+  //     }
+  //   });
+
+  //   const unsubMsg = socketService.on("receive_message", (message) => {
+  //     if (message.roomId === roomId) {
+  //       setMessages((prev) => {
+  //         const senderId = message.senderId?._id || message.senderId;
+  //         const isMe = senderId === currentUserId;
+
+  //         if (isMe) return prev;
+  //         if (prev.some((m) => m._id === message._id)) return prev;
+
+  //         playSound("receive");
+  //         socketService.emit("mark_read", { messageId: message._id, roomId });
+  //         return [...prev, message];
+  //       });
+  //     }
+  //   });
+
+  //   const unsubSent = socketService.on("message_sent", (data) => {
+  //     setMessages((prev) =>
+  //       prev.map((msg) =>
+  //         msg.tempId === data.tempId
+  //           ? { ...msg, _id: data.messageId, status: "sent" }
+  //           : msg,
+  //       ),
+  //     );
+  //   });
+
+  //   const unsubUpdated = socketService.on("message_updated", (updatedMsg) => {
+  //     if (updatedMsg.roomId === roomId) {
+  //       setMessages((prev) =>
+  //         prev.map((msg) =>
+  //           msg._id === updatedMsg._id
+  //             ? { ...msg, text: updatedMsg.text, isEdited: true }
+  //             : msg,
+  //         ),
+  //       );
+  //     }
+  //   });
+
+  //   const unsubDeleted = socketService.on("message_deleted", (data) => {
+  //     if (data.roomId === roomId) {
+  //       setMessages((prev) => prev.filter((msg) => msg._id !== data.messageId));
+  //     }
+  //   });
+
+  //   const unsubTyping = socketService.on("display_typing", (data) => {
+  //     if (data.userId === otherUserId && data.roomId === roomId) {
+  //       setOtherUserTyping(true);
+  //     }
+  //   });
+
+  //   const unsubStopTyping = socketService.on("hide_typing", (data) => {
+  //     if (data.userId === otherUserId && data.roomId === roomId) {
+  //       setOtherUserTyping(false);
+  //     }
+  //   });
+
+  //   const unsubRead = socketService.on("message_read", (data) => {
+  //     if (data.roomId === roomId) {
+  //       setMessages((prev) =>
+  //         prev.map((msg) =>
+  //           msg._id === data.messageId ? { ...msg, isRead: true } : msg,
+  //         ),
+  //       );
+  //     }
+  //   });
+
+  //   // 4. Cleanup Function
+  //   return () => {
+  //     // Unsubscribe all listeners
+  //     unsubOnline();
+  //     unsubStatus();
+  //     unsubMsg();
+  //     unsubSent();
+  //     unsubUpdated();
+  //     unsubDeleted();
+  //     unsubTyping();
+  //     unsubStopTyping();
+  //     unsubRead();
+
+  //     // Leave Room
+  //     socketService.emit("leave_room", { roomId });
+  //   };
+  // }, [currentUserId, otherUserId, roomId]);
+
+  // --- SOCKET CONNECTION & STATUS CHECK ---
+  useEffect(() => {
+    if (!currentUserId || !otherUserId || !roomId) return;
+
+    console.log("🧑‍💻 My ID:", currentUserId);
+    console.log("🕵️ Looking for Admin ID:", otherUserId);
+
+    // 1. సాకెట్ కనెక్ట్ చేయండి
+    socketService.connect();
+
+    // 2. అడ్మిన్ స్టేటస్ చెక్ చేసే ఫంక్షన్
+    const checkStatus = () => {
+      console.log("📡 Checking Admin Online Status...");
+      socketService.emit("check_online_status", { userId: otherUserId });
+    };
+
+    // సాకెట్ కనెక్ట్ అవ్వగానే ఒకసారి అడగాలి
+    if (socketService.socket?.connected) {
+      checkStatus();
+    }
+    const unsubConn = socketService.on("connect", checkStatus);
+
+    // 3. రూమ్ లో జాయిన్ అవ్వడం
+    socketService.emit("join_room", { roomId });
+
+    // 4. ఇవెంట్ లిజనర్స్ (Listeners)
+
+    // అడ్మిన్ స్టేటస్ క్వెరీకి వచ్చే డైరెక్ట్ రెస్పాన్స్
+    const unsubOnlineRes = socketService.on(
+      "is_user_online_response",
+
+      (data) => {
+        console.log(
+          "📩 Server Response for:",
+          data.userId,
+          "Is Online:",
+          data.isOnline,
+        );
+        if (String(data.userId) === String(otherUserId)) {
+          setOnlineStatus(data.isOnline ? "online" : "offline");
+        }
+      },
+    );
+
+    // 🔥 ఇది చాలా ముఖ్యం: బ్యాకెండ్ నుండి వచ్చే గ్లోబల్ అప్‌డేట్ (అడ్మిన్ మధ్యలో వస్తే)
+    const unsubStatusUpdate = socketService.on("user_status_update", (data) => {
       if (String(data.userId) === String(otherUserId)) {
         setOnlineStatus(data.isOnline ? "online" : "offline");
       }
     });
 
-    newSocket.on("user_status_update", (data) => {
-      if (String(data.userId) === String(otherUserId)) {
-        setOnlineStatus(data.isOnline ? "online" : "offline");
-        // 🔥 Future: If backend sends `lastSeen`, use: setOnlineStatus(data.lastSeen)
-      }
-    });
-
-    newSocket.on("receive_message", (message) => {
+    // మెసేజ్ రిసీవ్ చేసుకోవడం
+    const unsubMsg = socketService.on("receive_message", (message) => {
       if (message.roomId === roomId) {
         setMessages((prev) => {
-          // 🔥 FIX START: డూప్లికేట్స్ నివారించడానికి లాజిక్ 🔥
-
           const senderId = message.senderId?._id || message.senderId;
           const isMe = senderId === currentUserId;
+          if (isMe || prev.some((m) => m._id === message._id)) return prev;
 
-          // 1. ఒకవేళ ఈ మెసేజ్ పంపింది నేనే అయితే, దీన్ని యాడ్ చేయొద్దు.
-          // ఎందుకంటే "sendMessage" ఫంక్షన్ లోనే దీన్ని మనం ఆల్రెడీ యాడ్ చేశాం (Optimistic UI).
-          // కేవలం 'message_sent' ఈవెంట్ మాత్రమే దీని ఐడిని అప్డేట్ చేస్తుంది.
-          if (isMe) return prev;
-
-          // 2. ఒకవేళ మెసేజ్ ఆల్రెడీ లిస్ట్ లో ఉంటే (ID check), మళ్ళీ యాడ్ చేయొద్దు.
-          if (prev.some((m) => m._id === message._id)) return prev;
-
-          // 🔥 FIX END 🔥
-
-          // ఇతరులు పంపిన మెసేజ్ అయితే సౌండ్ ప్లే చేసి యాడ్ చెయ్
           playSound("receive");
-          newSocket.emit("mark_read", { messageId: message._id, roomId });
+          socketService.emit("mark_read", { messageId: message._id, roomId });
           return [...prev, message];
         });
       }
     });
-    newSocket.on("message_sent", (data) => {
-      // 🔥 Confirm Optimistic Message
+
+    // మెసేజ్ సెంటర్ కన్ఫర్మేషన్
+    const unsubSent = socketService.on("message_sent", (data) => {
       setMessages((prev) =>
         prev.map((msg) =>
           msg.tempId === data.tempId
@@ -1166,82 +1293,51 @@ export default function ChatComponent({
       );
     });
 
-    // --- EVENTS ---
-    newSocket.on("message_updated", (updatedMsg) => {
-      if (updatedMsg.roomId === roomId) {
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg._id === updatedMsg._id
-              ? { ...msg, text: updatedMsg.text, isEdited: true }
-              : msg,
-          ),
-        );
-      }
-    });
-
-    newSocket.on("message_deleted", (data) => {
-      if (data.roomId === roomId) {
-        setMessages((prev) => prev.filter((msg) => msg._id !== data.messageId));
-      }
-    });
-
-    newSocket.on("display_typing", (data) => {
-      if (data.userId === otherUserId && data.roomId === roomId) {
+    // టైపింగ్ ఇండికేటర్స్
+    const unsubTyping = socketService.on("display_typing", (data) => {
+      if (data.userId === otherUserId && data.roomId === roomId)
         setOtherUserTyping(true);
-      }
     });
 
-    newSocket.on("hide_typing", (data) => {
-      if (data.userId === otherUserId && data.roomId === roomId) {
+    const unsubStopTyping = socketService.on("hide_typing", (data) => {
+      if (data.userId === otherUserId && data.roomId === roomId)
         setOtherUserTyping(false);
-      }
     });
 
-    newSocket.on("message_read", (data) => {
-      if (data.roomId === roomId) {
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg._id === data.messageId ? { ...msg, isRead: true } : msg,
-          ),
-        );
-      }
-    });
-
+    // 5. Cleanup Function
     return () => {
-      newSocket.off("receive_message");
-      newSocket.off("message_sent");
-      newSocket.off("display_typing");
-      newSocket.off("hide_typing");
-      newSocket.off("user_status_update");
-      newSocket.off("message_read");
-      newSocket.off("message_updated");
-      newSocket.off("message_deleted");
-
-      newSocket.emit("leave_room", { roomId });
-      newSocket.disconnect();
+      unsubConn();
+      unsubOnlineRes();
+      unsubStatusUpdate();
+      unsubMsg();
+      unsubSent();
+      unsubTyping();
+      unsubStopTyping();
+      socketService.emit("leave_room", { roomId });
     };
-  }, [currentUserId, otherUserId, token, roomId, apiUrl]);
+  }, [currentUserId, otherUserId, roomId]);
 
   // --- PAGINATION & HISTORY ---
+  // 👇 REPLACE YOUR OLD fetchChatHistory FUNCTION WITH THIS:
+
   const fetchChatHistory = async (pageNum = 1) => {
+    console.log("ashok romm id ", roomId);
+    console.log("ashok admin id ", otherUserId);
     if (pageNum === 1) setIsLoadingHistory(true);
     else setIsFetchingOld(true);
 
     try {
-      // 🔥 Updated to pass page & limit
-      const res = await axios.get(
-        `${apiUrl}/api/chat/history/${roomId}?page=${pageNum}&limit=${MESSAGES_PER_PAGE}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+      // ✅ CHANGE: apiClient వాడుతున్నాం (Headers automatic)
+      const res = await apiClient.get(
+        `/chat/history/${roomId}?page=${pageNum}&limit=${MESSAGES_PER_PAGE}`,
       );
+      console.log(res);
 
       if (res.data.success) {
         let historyData = res.data.data?.messages || [];
 
-        // If backend doesn't support pagination yet, this handles full load gracefully
         if (!res.data.data?.pagination && pageNum > 1) {
-          historyData = []; // Stop duplicates if backend sends all
+          historyData = [];
           setHasMore(false);
         }
 
@@ -1258,7 +1354,8 @@ export default function ChatComponent({
           pageNum === 1 ? historyData : [...historyData, ...prev],
         );
 
-        if (pageNum === 1) socket?.emit("mark_read", { roomId });
+        // ✅ CHANGE: socketService వాడుతున్నాం
+        if (pageNum === 1) socketService.emit("mark_read", { roomId });
       }
     } catch (error) {
       console.error("Failed to fetch history", error);
@@ -1278,7 +1375,6 @@ export default function ChatComponent({
       setPage((prev) => {
         const nextPage = prev + 1;
         fetchChatHistory(nextPage).then(() => {
-          // Restore scroll position after loading
           requestAnimationFrame(() => {
             if (messagesContainerRef.current) {
               messagesContainerRef.current.scrollTop =
@@ -1291,22 +1387,24 @@ export default function ChatComponent({
     }
   };
 
-  // --- UPLOAD ---
+  // 👇 REPLACE YOUR uploadFile FUNCTION:
+
   const uploadFile = async (fileToUpload) => {
     setUploading(true);
     const formData = new FormData();
     formData.append("file", fileToUpload);
 
     try {
-      const res = await axios.post(`${apiUrl}/api/chat/upload`, formData, {
+      // ✅ CHANGE: apiClient Use చేయండి
+      const res = await apiClient.post(`/chat/upload`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
+          // Authorization header apiClient చూసుకుంటుంది
         },
       });
       if (res.data.success) return res.data.data;
     } catch (error) {
-      toast.error("File upload failed. Please try again."); // 🔥 Toast Update
+      toast.error("File upload failed. Please try again.");
       return null;
     } finally {
       setUploading(false);
@@ -1320,7 +1418,7 @@ export default function ChatComponent({
     if (!fileData && !textToSend.trim()) return;
 
     if (editingMessageId && !fileData) {
-      socket?.emit("edit_message", {
+      socketService.emit("edit_message", {
         roomId,
         messageId: editingMessageId,
         newText: textToSend,
@@ -1368,12 +1466,12 @@ export default function ChatComponent({
     playSound("send");
 
     // Send to Server
-    socket?.emit("send_message", messagePayload);
+    socketService.emit("send_message", messagePayload);
 
     setPreviewImage(null);
     setCaptionText("");
     setSelectedFile(null);
-    socket?.emit("stop_typing", { roomId });
+    socketService.emit("stop_typing", { roomId });
   };
 
   const handleFileSelect = (e) => {
@@ -1422,7 +1520,7 @@ export default function ChatComponent({
 
   const confirmDelete = () => {
     if (deleteConfirmationId) {
-      socket?.emit("delete_message", {
+      socketService.emit("delete_message", {
         roomId,
         messageId: deleteConfirmationId,
       });
@@ -1434,10 +1532,10 @@ export default function ChatComponent({
   };
 
   const handleTyping = () => {
-    if (!typingTimeoutRef.current) socket?.emit("typing", { roomId });
+    if (!typingTimeoutRef.current) socketService.emit("typing", { roomId });
     clearTimeout(typingTimeoutRef.current);
     typingTimeoutRef.current = setTimeout(() => {
-      socket?.emit("stop_typing", { roomId });
+      socketService.emit("stop_typing", { roomId });
       typingTimeoutRef.current = null;
     }, 800);
   };
