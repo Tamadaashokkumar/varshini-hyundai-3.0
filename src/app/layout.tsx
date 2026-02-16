@@ -9,7 +9,6 @@ import { Navbar } from "@/components/Navbar";
 import { CartDrawer } from "@/components/CartDrawer";
 import { Footer } from "@/components/Footer";
 import ChatFloatingButton from "@/components/ChatFloatingButton";
-import ActivityTrackerWrapper from "@/components/ActivityTrackerWrapper";
 import AdminMessageModal from "@/components/AdminMessageModal";
 import ScrollToTop from "@/components/ScrollToTop";
 import AuthProvider from "@/providers/AuthProvider";
@@ -56,7 +55,7 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <ScrollToTop />
-            <ActivityTrackerWrapper />
+
             <AdminMessageModal />
             <div className="flex flex-col min-h-screen bg-[#050B14] text-white antialiased">
               <Navbar />

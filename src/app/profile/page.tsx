@@ -19,6 +19,8 @@ import {
   Building,
   ChevronRight,
   AlertTriangle,
+  Check,
+  Loader2,
 } from "lucide-react";
 import apiClient from "@/services/apiClient";
 import toast from "react-hot-toast";
@@ -36,7 +38,12 @@ interface AddressFormData {
 }
 
 export default function ProfilePage() {
-  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const {
+    user,
+    isAuthenticated,
+    loading: authLoading,
+    refreshUser,
+  } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>("profile");
   const [isEditing, setIsEditing] = useState(false);
@@ -48,6 +55,7 @@ export default function ProfilePage() {
     name: "",
     phone: "",
   });
+  const [fetchingPincode, setFetchingPincode] = useState(false);
 
   const [addressData, setAddressData] = useState<AddressFormData>({
     addressType: "Home",
@@ -96,7 +104,7 @@ export default function ProfilePage() {
         toast.success("Address added successfully", { icon: "🏠" });
         setShowAddressModal(false);
         resetAddressForm();
-        window.location.reload();
+        await refreshUser();
       }
     } catch (error: any) {
       toast.error(error.response?.data?.error || "Failed to add address");
@@ -107,35 +115,88 @@ export default function ProfilePage() {
 
   const handleUpdateAddress = async () => {
     if (!editingAddress) return;
+
+    console.log("SENDING UPDATE REQUEST:", {
+      id: editingAddress._id,
+      data: addressData,
+    });
     setLoading(true);
     try {
       const response = await apiClient.put(
         `/auth/address/${editingAddress._id}`,
         addressData,
       );
+      console.log("UPDATE RESPONSE:", response.data);
       if (response.data.success) {
         toast.success("Address updated successfully", { icon: "✅" });
         setShowAddressModal(false);
         setEditingAddress(null);
         resetAddressForm();
-        window.location.reload();
+        console.log("Reloading page now...");
+        await refreshUser();
       }
     } catch (error: any) {
+      console.error("UPDATE ERROR:", error);
+      console.error("Error Response:", error.response?.data);
       toast.error(error.response?.data?.error || "Failed to update address");
     } finally {
       setLoading(false);
     }
   };
 
+  // 👇 Pincode Change & Auto-Fetch Logic
+  const handlePincodeChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const code = e.target.value.replace(/\D/g, ""); // కేవలం నంబర్స్ మాత్రమే తీసుకుంటుంది
+
+    // స్టేట్ అప్‌డేట్
+    setAddressData((prev) => ({ ...prev, pincode: code }));
+
+    // 6 అంకెలు రాగానే API కాల్ చేయాలి
+    if (code.length === 6) {
+      setFetchingPincode(true);
+      try {
+        const response = await fetch(
+          `https://api.postalpincode.in/pincode/${code}`,
+        );
+        const data = await response.json();
+
+        if (data[0].Status === "Success") {
+          const { District, State } = data[0].PostOffice[0];
+
+          setAddressData((prev) => ({
+            ...prev,
+            city: District,
+            state: State,
+            pincode: code, // కన్ఫర్మేషన్ కోసం
+          }));
+          toast.success("Location found!", { icon: "📍" });
+        } else {
+          toast.error("Invalid Pincode");
+          setAddressData((prev) => ({ ...prev, city: "", state: "" }));
+        }
+      } catch (error) {
+        console.error("Pincode API Error", error);
+      } finally {
+        setFetchingPincode(false);
+      }
+    }
+  };
+
   const handleDeleteAddress = async (addressId: string) => {
     if (!confirm("Are you sure you want to delete this address?")) return;
+    console.log("DELETING ADDRESS ID:", addressId);
     try {
       const response = await apiClient.delete(`/auth/address/${addressId}`);
+      console.log("DELETE RESPONSE:", response.data);
       if (response.data.success) {
         toast.success("Address deleted successfully", { icon: "🗑️" });
-        window.location.reload();
+        console.log("Reloading page now...");
+        await refreshUser();
       }
     } catch (error: any) {
+      console.error("DELETE ERROR:", error);
       toast.error(error.response?.data?.error || "Failed to delete address");
     }
   };
@@ -577,10 +638,11 @@ export default function ProfilePage() {
         </motion.main>
       </div>
 
-      {/* --- Glassmorphism Address Modal --- */}
+      {/* --- Glassmorphism Address Modal (FIXED & PINCODE AUTO-FETCH) --- */}
       <AnimatePresence>
         {showAddressModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -592,151 +654,220 @@ export default function ProfilePage() {
               className="fixed inset-0 bg-black/60 backdrop-blur-sm"
             />
 
+            {/* Modal Content */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              // Modal Glass Style
-              className="relative w-full max-w-lg bg-white/80 dark:bg-[#1a1f2e]/90 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/50 dark:border-white/10 overflow-hidden z-10"
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-md bg-white/90 dark:bg-[#1a1f2e]/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 dark:border-white/10 overflow-hidden z-10 flex flex-col max-h-[90vh]"
             >
-              <div className="px-8 py-6 border-b border-gray-200/50 dark:border-white/10 flex justify-between items-center bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-white/5 dark:to-white/5">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-gray-200/50 dark:border-white/10 flex justify-between items-center bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-white/5 dark:to-white/5">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                   {editingAddress ? (
-                    <Edit size={20} className="text-blue-600" />
+                    <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-full text-blue-600">
+                      <Edit size={16} />
+                    </div>
                   ) : (
-                    <Plus size={20} className="text-blue-600" />
+                    <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-full text-blue-600">
+                      <Plus size={16} />
+                    </div>
                   )}
-                  {editingAddress ? "Edit Address" : "Add New Address"}
+                  {editingAddress ? "Edit Address" : "New Address"}
                 </h3>
                 <button
                   onClick={() => {
                     setShowAddressModal(false);
                     resetAddressForm();
                   }}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white transition-colors p-1 bg-white/50 dark:bg-white/10 rounded-full hover:bg-gray-200 dark:hover:bg-white/20"
+                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white transition-colors p-1.5 hover:bg-black/5 dark:hover:bg-white/10 rounded-full"
                 >
-                  <X size={20} />
+                  <X size={18} />
                 </button>
               </div>
 
-              <div className="p-8 space-y-5">
-                {/* Address Form Inputs */}
-                <div>
-                  <label className={labelClass + " mb-2"}>Address Type</label>
-                  <select
-                    value={addressData.addressType}
-                    onChange={(e) =>
-                      setAddressData({
-                        ...addressData,
-                        addressType: e.target.value,
-                      })
-                    }
-                    className={inputClass}
-                  >
-                    <option value="Home">Home (All day delivery)</option>
-                    <option value="Work">
-                      Work (Delivery between 10 AM - 5 PM)
-                    </option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className={labelClass + " mb-2"}>Street Address</label>
-                  <textarea
-                    value={addressData.street}
-                    onChange={(e) =>
-                      setAddressData({ ...addressData, street: e.target.value })
-                    }
-                    placeholder="Flat No, Building, Street Area"
-                    rows={2}
-                    className={inputClass + " resize-none"}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-5">
-                  <div>
-                    <label className={labelClass + " mb-2"}>City</label>
-                    <input
-                      type="text"
-                      value={addressData.city}
-                      onChange={(e) =>
-                        setAddressData({ ...addressData, city: e.target.value })
-                      }
-                      placeholder="Mumbai"
-                      className={inputClass}
-                    />
+              {/* Form Body */}
+              <div className="p-6 overflow-y-auto custom-scrollbar">
+                <div className="space-y-5">
+                  {/* Address Type (Chips) */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">
+                      Address Type
+                    </label>
+                    <div className="flex gap-3">
+                      {["Home", "Work", "Other"].map((type) => {
+                        const isActive = addressData.addressType === type;
+                        return (
+                          <button
+                            key={type}
+                            onClick={() =>
+                              setAddressData({
+                                ...addressData,
+                                addressType: type,
+                              })
+                            }
+                            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 border ${
+                              isActive
+                                ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/25 scale-[1.02]"
+                                : "bg-white dark:bg-black/20 border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5"
+                            }`}
+                          >
+                            {type === "Home" && <Home size={16} />}
+                            {type === "Work" && <Building size={16} />}
+                            {type === "Other" && <MapPin size={16} />}
+                            {type}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
+
+                  {/* Pincode Input with Auto-Fetch */}
                   <div>
-                    <label className={labelClass + " mb-2"}>State</label>
-                    <input
-                      type="text"
-                      value={addressData.state}
+                    <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1 mb-1.5 flex justify-between">
+                      <span>Pincode</span>
+                      {fetchingPincode && (
+                        <span className="text-blue-600 flex items-center gap-1">
+                          <Loader2 size={12} className="animate-spin" /> Finding
+                          Location...
+                        </span>
+                      )}
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={addressData.pincode}
+                        onChange={handlePincodeChange}
+                        placeholder="Enter 6-digit Pincode"
+                        maxLength={6}
+                        className={
+                          inputClass +
+                          " py-2.5 text-sm font-mono tracking-wide pr-10"
+                        }
+                      />
+                      {addressData.pincode.length === 6 && !fetchingPincode && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+                          <Check size={18} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* City & State (Auto-filled) */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1 mb-1.5 block">
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        value={addressData.city}
+                        readOnly // Auto-filled కాబట్టి readOnly పెట్టచ్చు, లేదా ఎడిట్ కి వదిలేయచ్చు
+                        onChange={(e) =>
+                          setAddressData({
+                            ...addressData,
+                            city: e.target.value,
+                          })
+                        }
+                        placeholder="Auto-filled"
+                        className={`${inputClass} py-2.5 text-sm ${addressData.city ? "bg-blue-50/50 dark:bg-blue-900/10" : ""}`}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1 mb-1.5 block">
+                        State
+                      </label>
+                      <input
+                        type="text"
+                        value={addressData.state}
+                        readOnly
+                        onChange={(e) =>
+                          setAddressData({
+                            ...addressData,
+                            state: e.target.value,
+                          })
+                        }
+                        placeholder="Auto-filled"
+                        className={`${inputClass} py-2.5 text-sm ${addressData.state ? "bg-blue-50/50 dark:bg-blue-900/10" : ""}`}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Street Address */}
+                  <div>
+                    <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1 mb-1.5 block">
+                      Street Address / Area
+                    </label>
+                    <textarea
+                      value={addressData.street}
                       onChange={(e) =>
                         setAddressData({
                           ...addressData,
-                          state: e.target.value,
+                          street: e.target.value,
                         })
                       }
-                      placeholder="Maharashtra"
-                      className={inputClass}
+                      placeholder="Flat No, Building, Landmark"
+                      rows={2}
+                      className={inputClass + " text-sm resize-none py-2.5"}
                     />
                   </div>
-                </div>
 
-                <div>
-                  <label className={labelClass + " mb-2"}>PIN Code</label>
-                  <input
-                    type="text"
-                    value={addressData.pincode}
-                    onChange={(e) =>
+                  {/* Default Checkbox */}
+                  <div
+                    onClick={() =>
                       setAddressData({
                         ...addressData,
-                        pincode: e.target.value,
+                        isDefault: !addressData.isDefault,
                       })
                     }
-                    placeholder="400001"
-                    maxLength={6}
-                    className={inputClass}
-                  />
-                </div>
-
-                <div className="flex items-center gap-3 pt-2 p-4 bg-blue-50/50 dark:bg-white/5 rounded-xl border border-blue-100 dark:border-white/5">
-                  <input
-                    type="checkbox"
-                    id="isDefault"
-                    checked={addressData.isDefault}
-                    onChange={(e) =>
-                      setAddressData({
-                        ...addressData,
-                        isDefault: e.target.checked,
-                      })
-                    }
-                    className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointerAccent-blue-600"
-                  />
-                  <label
-                    htmlFor="isDefault"
-                    className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer select-none flex-1"
+                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                      addressData.isDefault
+                        ? "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800"
+                        : "bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-white/10"
+                    }`}
                   >
-                    Set as default address for fast checkout
-                  </label>
+                    <div
+                      className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${
+                        addressData.isDefault
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-200 dark:bg-white/20"
+                      }`}
+                    >
+                      {addressData.isDefault && (
+                        <Check size={14} strokeWidth={3} />
+                      )}
+                    </div>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Use as default delivery address
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div className="p-8 pt-0">
-                <button
+              {/* Footer */}
+              <div className="p-6 pt-2 bg-white/50 dark:bg-black/20 backdrop-blur-sm border-t border-gray-100 dark:border-white/5">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={
                     editingAddress ? handleUpdateAddress : handleAddAddress
                   }
-                  disabled={loading}
-                  className={"w-full " + primaryBtnClass + " py-4 text-base"}
+                  disabled={loading || fetchingPincode} // Pincode తెస్తున్నప్పుడు డిసేబుల్
+                  className={
+                    "w-full " +
+                    primaryBtnClass +
+                    " py-3.5 text-sm shadow-xl shadow-blue-500/20"
+                  }
                 >
-                  {loading
-                    ? "Saving..."
-                    : editingAddress
-                      ? "Update Address"
-                      : "Save Address"}
-                </button>
+                  {loading ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 size={16} className="animate-spin" />
+                      Saving...
+                    </div>
+                  ) : (
+                    <>{editingAddress ? "Update Address" : "Save Address"}</>
+                  )}
+                </motion.button>
               </div>
             </motion.div>
           </div>

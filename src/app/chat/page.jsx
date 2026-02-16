@@ -1,66 +1,20 @@
-// "use client";
-
-// import { useEffect, useState } from "react";
-// import ChatComponent from "@/components/ChatComponent";
-// import { useAuth } from "@/hooks/useAuth";
-// import { useRouter } from "next/navigation";
-// import { getAccessToken } from "@/services/apiClient";
-
-// export default function ChatPage() {
-//   const { user, loading, isAuthenticated } = useAuth();
-//   const [token, setToken] = useState(null);
-//   const router = useRouter();
-//   console.log("ashok", user);
-
-//   useEffect(() => {
-//     if (!loading) {
-//       if (!isAuthenticated || !user) {
-//         router.push("/login");
-//       } else {
-//         const currentToken = getAccessToken();
-//         setToken(currentToken);
-//       }
-//     }
-//   }, [user, loading, isAuthenticated, router]);
-
-//   if (loading) {
-//     return (
-//       <div className="flex items-center justify-center h-screen bg-gray-50">
-//         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-//       </div>
-//     );
-//   }
-
-//   if (!user || !token) {
-//     return null;
-//   }
-
-//   // Admin ID
-//   const adminId = process.env.NEXT_PUBLIC_ADMIN_ID;
-
-//   return (
-//     <div className="h-[calc(100vh-80px)] bg-gray-100 box-border">
-//       <ChatComponent
-//         currentUserId={user._id}
-//         otherUserId={adminId}
-//         otherUserModel="Admin"
-//         token={token}
-//         apiUrl={process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000"}
-//       />
-//     </div>
-//   );
-// }
-
 "use client";
 
 import ChatComponent from "@/components/ChatComponent";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react"; // useState import చేయండి
 
 export default function ChatPage() {
   const { user, loading, isAuthenticated } = useAuth();
   const router = useRouter();
+
+  // హైడ్రేషన్ ఎర్రర్స్ రాకుండా మౌంట్ చెక్
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -68,7 +22,8 @@ export default function ChatPage() {
     }
   }, [loading, isAuthenticated, router]);
 
-  if (loading) {
+  // ఇంకా లోడ్ అవుతుంటే లేదా క్లయింట్ సైడ్ మౌంట్ కాకపోతే
+  if (!mounted || loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -78,13 +33,15 @@ export default function ChatPage() {
 
   if (!user) return null;
 
-  // Admin ID
-  const adminId = process.env.NEXT_PUBLIC_ADMIN_ID;
+  // అడ్మిన్ ఐడి (మీరు హార్డ్ కోడ్ చేసినది లేదా env నుండి)
+  const adminId =
+    process.env.NEXT_PUBLIC_ADMIN_ID || "694673ed8eac361b130a1b5d";
 
   return (
     <div className="h-[calc(100vh-80px)] bg-gray-100 box-border">
       <ChatComponent
-        currentUserId={user.id} // Check if your user object has _id or id
+        // 🔥 FIX: user.id బదులు user._id వాడండి (Backup గా user.id)
+        currentUserId={user._id || user.id}
         otherUserId={adminId}
         otherUserModel="Admin"
       />
