@@ -47,6 +47,24 @@ export const useAuth = () => {
 
   const isChecking = useRef<boolean>(false);
 
+  // 🔥 NEW FUNCTION: Socket ని Token తో కనెక్ట్ చేయడానికి హెల్పర్ ఫంక్షన్
+  const connectSocketWithToken = useCallback(async () => {
+    try {
+      // 1. Backend నుండి Token తెచ్చుకోవడం (Vercel Rewrite ద్వారా)
+      const response = await apiClient.get("/auth/get-socket-token");
+
+      if (response.data?.token) {
+        console.log("[useAuth]: 🔌 Connecting socket with token...");
+
+        socketService.connect(response.data.token);
+        // 3. కనెక్షన్ స్టార్ట్ చేయడం
+        socketService.connect();
+      }
+    } catch (error) {
+      console.error("⚠️ [useAuth]: Failed to connect socket with token", error);
+    }
+  }, []);
+
   // ==================== CHECK AUTH STATUS ====================
   const checkAuthStatus = useCallback(async () => {
     if (isAuthInitialized || isChecking.current) {
@@ -70,7 +88,8 @@ export const useAuth = () => {
         setUser(response.data.data.user as any);
 
         if (response.data.data.user?._id) {
-          socketService.connect();
+          // socketService.connect();
+          await connectSocketWithToken();
         }
       } else {
         console.log("[useAuth]: No valid session found.");
@@ -124,7 +143,8 @@ export const useAuth = () => {
         const userData = response.data.data.user;
         setUser(userData as any);
         setAuthInitialized(true);
-        socketService.connect();
+        //socketService.connect();
+        await connectSocketWithToken();
         toast.success(`Welcome back, ${userData.name}!`);
         return { success: true, user: userData };
       }
@@ -151,7 +171,8 @@ export const useAuth = () => {
         const userData = response.data.data.user;
         setUser(userData as any);
         setAuthInitialized(true);
-        socketService.connect();
+        //socketService.connect();
+        await connectSocketWithToken();
         toast.success(`Welcome, ${userData.name}!`);
         return { success: true, user: userData };
       }

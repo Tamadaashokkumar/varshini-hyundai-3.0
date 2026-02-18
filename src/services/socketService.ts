@@ -128,30 +128,66 @@ class SocketService {
   private isConnecting = false;
 
   // ================= CONNECTION =================
-  connect() {
+  // connect() {
+  //   if (this.socket?.connected) return;
+
+  //   // ఒకవేళ ఆల్రెడీ ఇనిషియలైజ్ అయ్యి, కనెక్ట్ అవుతూ ఉంటే ఆగిపో
+  //   if (this.socket && this.isConnecting) return;
+
+  //   this.isConnecting = true;
+
+  //   if (!this.socket) {
+  //     this.socket = io(SOCKET_URL, {
+  //       withCredentials: true, // 🔥 Cookies పంపడానికి ఇది ముఖ్యం
+  //       transports: ["websocket", "polling"],
+  //       reconnection: true,
+  //       reconnectionAttempts: 5,
+  //       reconnectionDelay: 1000,
+  //       autoConnect: false, // మనం కింద మాన్యువల్ గా కనెక్ట్ చేస్తాం
+  //       query: {
+  //         clientType: "customer",
+  //       },
+  //     });
+
+  //     this.registerCoreEvents();
+  //   }
+
+  //   this.socket.connect();
+  // }
+
+  connect(token?: string) {
     if (this.socket?.connected) return;
 
-    // ఒకవేళ ఆల్రెడీ ఇనిషియలైజ్ అయ్యి, కనెక్ట్ అవుతూ ఉంటే ఆగిపో
+    // ఆల్రెడీ కనెక్ట్ అవుతుంటే ఆగిపో
     if (this.socket && this.isConnecting) return;
 
     this.isConnecting = true;
 
     if (!this.socket) {
+      // First time initialization
       this.socket = io(SOCKET_URL, {
-        withCredentials: true, // 🔥 Cookies పంపడానికి ఇది ముఖ్యం
+        withCredentials: true,
         transports: ["websocket", "polling"],
         reconnection: true,
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
-        autoConnect: false, // మనం కింద మాన్యువల్ గా కనెక్ట్ చేస్తాం
+        autoConnect: false,
+        // 🔥 CHANGE 2: టోకెన్ వస్తే ఇక్కడ సెట్ అవుతుంది
+        auth: token ? { token } : {},
         query: {
           clientType: "customer",
         },
       });
 
       this.registerCoreEvents();
+    } else {
+      // 🔥 CHANGE 3: సాకెట్ ఆల్రెడీ ఉంటే, టోకెన్ ని అప్డేట్ చేయాలి
+      if (token) {
+        this.socket.auth = { token };
+      }
     }
 
+    // Connect call
     this.socket.connect();
   }
 
