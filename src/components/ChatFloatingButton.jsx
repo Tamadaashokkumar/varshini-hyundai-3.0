@@ -379,7 +379,7 @@ export default function ChatFloatingButton() {
     <>
       {isChatOpen && createPortal(chatModalContent, document.body)}
 
-      <div className="fixed bottom-14 right-6 z-[9990] flex flex-col items-end gap-5">
+      <div className="fixed bottom-16 right-6 z-[9990] flex flex-col items-end gap-5">
         {/* 🔥 Sub Buttons (Menu Options) */}
         <AnimatePresence>
           {isMenuOpen && (
