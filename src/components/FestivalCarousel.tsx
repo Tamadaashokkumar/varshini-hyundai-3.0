@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Tag, ArrowRight } from "lucide-react";
+import { Tag, ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -27,26 +27,26 @@ interface ApiResponse {
   data: CarouselItem[];
 }
 
-// 🔥 NEW: Animation Variants (Slide Effect)
+// 🔥 Slide Animation Variants (Unchanged Logic)
 const slideVariants = {
   enter: {
-    x: "100%", // కుడి వైపు నుండి వస్తుంది
+    x: "100%",
     opacity: 1,
-    zIndex: 1, // కొత్త స్లైడ్ పైన ఉంటుంది
+    zIndex: 1,
   },
   center: {
-    x: 0, // మధ్యలోకి వస్తుంది
+    x: 0,
     opacity: 1,
     zIndex: 1,
     transition: {
       duration: 1.2,
-      ease: [0.16, 1, 0.3, 1], // "Premium" Bezier Curve
+      ease: [0.16, 1, 0.3, 1],
     },
   },
   exit: {
-    x: "-25%", // పాత స్లైడ్ కొంచెం ఎడమ వైపుకి వెళ్తుంది (Parallax)
+    x: "-25%",
     opacity: 0,
-    zIndex: 0, // పాత స్లైడ్ వెనక్కి వెళ్తుంది
+    zIndex: 0,
     transition: {
       duration: 1.2,
       ease: [0.16, 1, 0.3, 1],
@@ -59,7 +59,7 @@ const FestivalCarousel = () => {
   const [current, setCurrent] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // --- Fetch Data ---
+  // --- Fetch Data (Unchanged) ---
   useEffect(() => {
     const fetchCarousels = async () => {
       try {
@@ -76,7 +76,7 @@ const FestivalCarousel = () => {
     fetchCarousels();
   }, []);
 
-  // --- Auto Play Logic ---
+  // --- Auto Play Logic (Unchanged) ---
   useEffect(() => {
     if (slides.length <= 1) return;
     const interval = setInterval(() => {
@@ -87,12 +87,12 @@ const FestivalCarousel = () => {
 
   // --- Text Animations ---
   const textVariants = {
-    hidden: { opacity: 0, x: 50 }, // టెక్స్ట్ కూడా పక్క నుండి వస్తుంది
+    hidden: { opacity: 0, x: 50 },
     visible: (i: number) => ({
       opacity: 1,
       x: 0,
       transition: {
-        delay: 0.6 + i * 0.1, // స్లైడ్ వచ్చిన తర్వాత టెక్స్ట్ వస్తుంది
+        delay: 0.4 + i * 0.1, // Slightly faster for snappier feel
         duration: 0.8,
         ease: "easeOut",
       },
@@ -101,8 +101,8 @@ const FestivalCarousel = () => {
 
   if (loading)
     return (
-      <div className="w-full h-screen bg-neutral-950 flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+      <div className="w-full h-screen bg-black flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-white/20 border-t-pink-500 rounded-full animate-spin" />
       </div>
     );
 
@@ -111,39 +111,41 @@ const FestivalCarousel = () => {
   const currentSlide = slides[current];
 
   return (
-    <section className="relative w-full h-[85vh] md:h-screen overflow-hidden font-sans bg-black">
-      {/* Slides Container */}
+    <section className="relative w-full h-[100dvh] overflow-hidden font-sans bg-black">
       <AnimatePresence initial={false} mode="popLayout">
         <motion.div
           key={current}
-          variants={slideVariants} // 🔥 Applying New Slide Variants
+          variants={slideVariants}
           initial="enter"
           animate="center"
           exit="exit"
-          className={`absolute inset-0 w-full h-full flex items-center ${currentSlide.bgClass}`}
+          className="absolute inset-0 w-full h-full flex items-center"
         >
           {/* ================= BACKGROUND LAYER ================= */}
           <div className="absolute inset-0 w-full h-full">
             {currentSlide.image && (
-              <motion.div className="absolute inset-0 w-full h-full">
+              <div className="absolute inset-0 w-full h-full">
+                {/* 🔥 UPDATED: Removed opacity & mix-blend. Image is 100% Clear. */}
                 <img
                   src={currentSlide.image}
                   alt={currentSlide.title}
-                  className="w-full h-full object-cover opacity-50 mix-blend-overlay md:opacity-100 md:mix-blend-normal"
+                  className="w-full h-full object-cover object-center scale-105" // scale-105 prevents white edges
                 />
-              </motion.div>
+              </div>
             )}
 
-            {/* Dark Gradient Overlay (Text Visibility) */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10" />
+            {/* 🔥 UPDATED OVERLAY: Gradient only on the left for text readability. 
+                The right side remains crystal clear to show the product/image. */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10" />
+
+            {/* Optional: Bottom gradient for mobile readability */}
+            <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/80 to-transparent z-10 md:hidden" />
           </div>
 
           {/* ================= CONTENT LAYER ================= */}
-          <div className="relative z-20 container mx-auto px-6 md:px-12 h-full flex flex-col justify-center">
-            <div className="max-w-4xl pl-2 md:pl-0 overflow-hidden">
-              {" "}
-              {/* overflow-hidden added to prevent text flicker */}
-              {/* Discount Tag */}
+          <div className="relative z-20 container mx-auto px-6 md:px-16 h-full flex flex-col justify-center">
+            <div className="max-w-3xl">
+              {/* 1. DISCOUNT TAG */}
               <motion.div
                 custom={0}
                 variants={textVariants}
@@ -151,39 +153,42 @@ const FestivalCarousel = () => {
                 animate="visible"
                 className="mb-6 inline-block"
               >
-                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
-                  <Tag size={16} className="text-yellow-400 fill-yellow-400" />
-                  <span className="text-xs md:text-sm font-bold uppercase tracking-[0.15em] text-white">
+                <div className="flex items-center gap-2 px-5 py-2 rounded-full bg-pink-600/90 backdrop-blur-md border border-pink-400/50 shadow-[0_0_20px_rgba(236,72,153,0.4)]">
+                  <Sparkles size={14} className="text-white animate-pulse" />
+                  <span className="text-xs md:text-sm font-bold uppercase tracking-widest text-white">
                     {currentSlide.discount}
                   </span>
                 </div>
               </motion.div>
-              {/* Title */}
+
+              {/* 2. TITLE (Big & Bold) */}
               <motion.h1
                 custom={1}
                 variants={textVariants}
                 initial="hidden"
                 animate="visible"
-                className="text-5xl md:text-7xl lg:text-9xl font-black text-white leading-[0.95] tracking-tighter mb-6 drop-shadow-2xl"
+                className="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[1] tracking-tighter mb-4 drop-shadow-2xl"
               >
                 {currentSlide.title}
               </motion.h1>
-              {/* Subtitle */}
+
+              {/* 3. SUBTITLE & DESC */}
               <motion.div
                 custom={2}
                 variants={textVariants}
                 initial="hidden"
                 animate="visible"
-                className="mb-10 space-y-4 max-w-2xl"
+                className="mb-8 space-y-4"
               >
-                <h3 className="text-2xl md:text-4xl font-light text-white/90">
+                <h3 className="text-2xl md:text-3xl font-light text-white/90 tracking-tight">
                   {currentSlide.subtitle}
                 </h3>
-                <p className="text-base md:text-lg text-white/70 font-medium leading-relaxed">
+                <p className="text-base md:text-lg text-white/80 font-medium leading-relaxed max-w-xl border-l-4 border-pink-500 pl-4">
                   {currentSlide.description}
                 </p>
               </motion.div>
-              {/* Button */}
+
+              {/* 4. BUTTON */}
               <motion.div
                 custom={3}
                 variants={textVariants}
@@ -191,12 +196,12 @@ const FestivalCarousel = () => {
                 animate="visible"
               >
                 <Link href={currentSlide.link}>
-                  <button className="group relative px-10 py-5 bg-white text-black font-extrabold text-sm uppercase tracking-widest overflow-hidden rounded-xl transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.4)]">
-                    <span className="relative z-10 flex items-center gap-3">
+                  <button className="group relative px-8 py-4 bg-white text-black font-bold text-sm uppercase tracking-widest rounded-lg overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.5)]">
+                    <span className="relative z-10 flex items-center gap-2">
                       {currentSlide.buttonText}
                       <ArrowRight
-                        size={20}
-                        className="group-hover:translate-x-1 transition-transform"
+                        size={18}
+                        className="group-hover:translate-x-1 transition-transform duration-300"
                       />
                     </span>
                   </button>
@@ -207,18 +212,22 @@ const FestivalCarousel = () => {
         </motion.div>
       </AnimatePresence>
 
-      {/* --- Progress Bars (Bottom Right) --- */}
-      <div className="absolute bottom-10 right-10 z-30 flex gap-3">
+      {/* --- Progress Indicators (Clean & Visible) --- */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-16 z-30 flex gap-4">
         {slides.map((_, idx) => (
           <button
             key={idx}
             onClick={() => setCurrent(idx)}
-            className={`h-1.5 rounded-full transition-all duration-500 ${
-              current === idx
-                ? "w-12 bg-white"
-                : "w-3 bg-white/30 hover:bg-white/60"
-            }`}
-          />
+            className="group relative py-2" // Larger hit area
+          >
+            <span
+              className={`block h-1 rounded-full transition-all duration-500 shadow-sm ${
+                current === idx
+                  ? "w-12 bg-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.8)]"
+                  : "w-2 bg-white/40 group-hover:bg-white/80"
+              }`}
+            />
+          </button>
         ))}
       </div>
     </section>
