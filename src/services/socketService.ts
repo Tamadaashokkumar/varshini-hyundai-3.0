@@ -128,43 +128,61 @@ class SocketService {
   private isConnecting = false;
 
   // ================= CONNECTION =================
-  // connect() {
+
+  // connect(token?: string) {
   //   if (this.socket?.connected) return;
 
-  //   // ఒకవేళ ఆల్రెడీ ఇనిషియలైజ్ అయ్యి, కనెక్ట్ అవుతూ ఉంటే ఆగిపో
+  //   // ఆల్రెడీ కనెక్ట్ అవుతుంటే ఆగిపో
   //   if (this.socket && this.isConnecting) return;
 
   //   this.isConnecting = true;
 
   //   if (!this.socket) {
+  //     // First time initialization
   //     this.socket = io(SOCKET_URL, {
-  //       withCredentials: true, // 🔥 Cookies పంపడానికి ఇది ముఖ్యం
+  //       withCredentials: true,
   //       transports: ["websocket", "polling"],
   //       reconnection: true,
   //       reconnectionAttempts: 5,
   //       reconnectionDelay: 1000,
-  //       autoConnect: false, // మనం కింద మాన్యువల్ గా కనెక్ట్ చేస్తాం
+  //       autoConnect: false,
+  //       // 🔥 CHANGE 2: టోకెన్ వస్తే ఇక్కడ సెట్ అవుతుంది
+  //       auth: token ? { token } : {},
   //       query: {
   //         clientType: "customer",
   //       },
   //     });
 
   //     this.registerCoreEvents();
+  //   } else {
+  //     // 🔥 CHANGE 3: సాకెట్ ఆల్రెడీ ఉంటే, టోకెన్ ని అప్డేట్ చేయాలి
+  //     if (token) {
+  //       this.socket.auth = { token };
+  //     }
   //   }
 
+  //   // Connect call
   //   this.socket.connect();
   // }
 
   connect(token?: string) {
-    if (this.socket?.connected) return;
+    // 🔥 FIX 1: కొత్త టోకెన్ వస్తే, పాత కనెక్షన్‌ని డిస్కనెక్ట్ చేయాలి
+    if (this.socket?.connected && token) {
+      console.log("🔄 Reconnecting socket with new token...");
+      this.socket.disconnect(); // పాతది కట్ చేస్తున్నాం
+      this.socket.auth = { token }; // కొత్త టోకెన్ సెట్ చేస్తున్నాం
+      // కింద మళ్ళీ కనెక్ట్ అవుతుంది...
+    }
+    // టోకెన్ ఇవ్వకపోతే, ఆల్రెడీ కనెక్ట్ అయి ఉంటే ఆగిపో
+    else if (this.socket?.connected) {
+      return;
+    }
 
-    // ఆల్రెడీ కనెక్ట్ అవుతుంటే ఆగిపో
     if (this.socket && this.isConnecting) return;
 
     this.isConnecting = true;
 
     if (!this.socket) {
-      // First time initialization
       this.socket = io(SOCKET_URL, {
         withCredentials: true,
         transports: ["websocket", "polling"],
@@ -172,8 +190,7 @@ class SocketService {
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
         autoConnect: false,
-        // 🔥 CHANGE 2: టోకెన్ వస్తే ఇక్కడ సెట్ అవుతుంది
-        auth: token ? { token } : {},
+        auth: token ? { token } : {}, // టోకెన్ పంపిస్తున్నాం
         query: {
           clientType: "customer",
         },
@@ -181,13 +198,12 @@ class SocketService {
 
       this.registerCoreEvents();
     } else {
-      // 🔥 CHANGE 3: సాకెట్ ఆల్రెడీ ఉంటే, టోకెన్ ని అప్డేట్ చేయాలి
+      // సాకెట్ ఆబ్జెక్ట్ ఉంది కానీ కనెక్ట్ అవ్వలేదు, టోకెన్ అప్డేట్ చేద్దాం
       if (token) {
         this.socket.auth = { token };
       }
     }
 
-    // Connect call
     this.socket.connect();
   }
 

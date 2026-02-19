@@ -293,7 +293,7 @@ export default function Home() {
               playsInline
               // Added 'brightness-100' to ensure full clarity.
               // 'object-cover' ensures it fills the screen without stretching.
-              className="w-full h-full object-cover object-center brightness-125 contrast-110"
+              className="w-full h-full object-cover object-[center_bottom] brightness-125 contrast-110"
             >
               <source src="/videos/video.mp4" type="video/mp4" />
             </video>

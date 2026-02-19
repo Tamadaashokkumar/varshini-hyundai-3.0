@@ -211,7 +211,28 @@ export default function ChatComponentPopup({
   useEffect(() => {
     if (!roomId || !currentUserId || !otherUserId) return;
 
-    socketService.connect();
+    const connectSocketWithFreshToken = async () => {
+      try {
+        console.log("🔌 Fetching latest token and Connecting Socket...");
+
+        // 1. API కాల్ చేసి ఫ్రెష్ టోకెన్ తెచ్చుకోవడం (ఇది ముఖ్యం!)
+        const { data } = await apiClient.get("/auth/get-socket-token");
+
+        // 2. ఆ టోకెన్ తో సాకెట్ ని కనెక్ట్ చేయడం
+        if (data?.token) {
+          socketService.connect(data.token);
+        } else {
+          // ఒకవేళ టోకెన్ రాకపోతే, ఉన్నదానితో ట్రై చేయి (Fallback)
+          socketService.connect();
+        }
+      } catch (err) {
+        console.error("Socket Auth Error:", err);
+        socketService.connect();
+      }
+    };
+
+    // ఫంక్షన్ కాల్ చేయడం
+    connectSocketWithFreshToken();
 
     const handleConnect = () => {
       socketService.emit("join_room", { roomId });
