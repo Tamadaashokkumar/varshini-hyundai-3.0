@@ -146,15 +146,21 @@ export const useAuth = () => {
         const userData = response.data.data.user;
         setUser(userData as any);
         setAuthInitialized(true);
-        //socketService.connect();
         await connectSocketWithToken();
         toast.success(`Welcome back, ${userData.name}!`);
         return { success: true, user: userData };
       }
       return { success: false, error: "Invalid response from server" };
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || "Login failed.";
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Login failed. Please try again.";
+
+      // ఒకవేళ ఈమెయిల్ వెరిఫై కాకపోతే, ఆ మెసేజ్‌ను టోస్ట్ లాగా చూపిస్తాం
       toast.error(errorMessage);
+
+      // ఎర్రర్ మెసేజ్‌ని రిటర్న్ చేస్తాం, తద్వారా Login Page లో కూడా చూపించవచ్చు
       return { success: false, error: errorMessage };
     } finally {
       setLoading(false);
@@ -162,6 +168,7 @@ export const useAuth = () => {
   };
 
   // ==================== REGISTER ====================
+
   const register = async (data: any) => {
     setLoading(true);
     try {
@@ -170,19 +177,25 @@ export const useAuth = () => {
         data,
       );
 
-      if (response.data.success && response.data.data?.user) {
-        const userData = response.data.data.user;
-        setUser(userData as any);
-        setAuthInitialized(true);
-        //socketService.connect();
-        await connectSocketWithToken();
-        toast.success(`Welcome, ${userData.name}!`);
-        return { success: true, user: userData };
+      // 🔥 ఇక్కడ మార్పు చేసాము:
+      // ఇప్పుడు మనం ఆటోమేటిక్ లాగిన్ చేయడం లేదు, కేవలం రిజిస్ట్రేషన్ సక్సెస్ అని చెప్తున్నాం
+      if (response.data.success) {
+        // బ్యాకెండ్ నుండి వచ్చే సక్సెస్ మెసేజ్‌ను చూపిస్తాం (e.g., "Please check email...")
+        toast.success(
+          response.data.message ||
+            "Registration successful! Please check your email.",
+        );
+
+        // యూజర్‌ను సెట్ చేయం (setUser వాడకూడదు), ఎందుకంటే అతను ఇంకా వెరిఫై అవ్వలేదు
+        return { success: true };
       }
+
       return { success: false, error: "Registration failed" };
     } catch (error: any) {
       const errorMessage =
-        error.response?.data?.message || "Registration failed.";
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Registration failed.";
       toast.error(errorMessage);
       return { success: false, error: errorMessage };
     } finally {

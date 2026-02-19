@@ -109,14 +109,16 @@ export const Footer = () => {
     },
   ];
 
-  // Hide footer on specific pages
+  // Hide footer on specific pages  verify-email
   if (
     pathname === "/login" ||
     pathname === "/register" ||
     pathname === "/forgot-password" ||
     pathname?.startsWith("/admin") ||
     pathname === "/chat" ||
-    pathname === "/checkout"
+    pathname === "/checkout" ||
+    pathname?.startsWith("/reset-password") ||
+    pathname?.startsWith("/verify-email")
   ) {
     return null;
   }

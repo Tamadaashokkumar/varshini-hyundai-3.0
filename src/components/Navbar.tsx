@@ -692,7 +692,9 @@ export const Navbar = () => {
     pathname === "/forgot-password" ||
     pathname?.startsWith("/admin") ||
     pathname === "/chat" ||
-    pathname === "/checkout"
+    pathname === "/checkout" ||
+    pathname?.startsWith("/reset-password") ||
+    pathname?.startsWith("/verify-email")
   ) {
     return null;
   }

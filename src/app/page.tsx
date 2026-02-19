@@ -294,7 +294,7 @@ export default function Home() {
               playsInline
               className="hidden md:block w-full h-full object-cover object-center scale-105"
             >
-              <source src="/videos/desktopvideo.mp4" type="video/mp4" />
+              <source src="/videos/videodesktop.mp4" type="video/mp4" />
             </video>
 
             {/* Mobile Video (Hidden on desktop) */}

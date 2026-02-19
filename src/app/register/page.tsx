@@ -122,8 +122,21 @@ export default function RegisterPage() {
 
     try {
       const result = await register(formData);
+
+      // 🔥 Strict Block Logic:
+      // బ్యాకెండ్ ఇప్పుడు టోకెన్ పంపదు, కేవలం success: true పంపుతుంది.
       if (result?.success) {
-        router.push("/");
+        toast.success(
+          "Registration Successful! 📩 Please check your email to verify your account.",
+          {
+            duration: 8000,
+          },
+        );
+
+        // యూజర్‌ని లాగిన్ పేజీకి పంపండి, అక్కడ అతను వెరిఫై అయ్యాక లాగిన్ అవుతాడు
+        setTimeout(() => {
+          router.push("/login");
+        }, 3000);
       } else {
         setError(
           result?.error ||
