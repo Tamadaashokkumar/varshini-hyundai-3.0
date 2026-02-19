@@ -55,13 +55,16 @@ export const useAuth = () => {
 
       if (response.data?.token) {
         console.log("[useAuth]: 🔌 Connecting socket with token...");
-
+        // 2 & 3. టోకెన్ పాస్ చేసి కనెక్ట్ చేయడం (ఒకే లైన్ చాలు)
         socketService.connect(response.data.token);
-        // 3. కనెక్షన్ స్టార్ట్ చేయడం
-        socketService.connect();
+      } else {
+        console.log("⚠️ No token found, trying normal connect...");
+        socketService.connect(); // ఒకవేళ టోకెన్ రాకపోతే నార్మల్ గా కనెక్ట్ అవ్వు
       }
     } catch (error) {
       console.error("⚠️ [useAuth]: Failed to connect socket with token", error);
+      // ఫెయిల్ అయినా సరే ఉన్నదానితో కనెక్ట్ అవ్వడానికి ట్రై చేయి
+      socketService.connect();
     }
   }, []);
 
