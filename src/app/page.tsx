@@ -283,33 +283,43 @@ export default function Home() {
           className="relative w-full h-[100dvh] overflow-hidden bg-black"
         >
           {/* ==============================
-          VIDEO LAYER (Crystal Clear)
-      ============================== */}
+          VIDEO LAYER (Crystal Clear & Responsive)
+          ============================== */}
           <div className="absolute inset-0 z-0">
+            {/* Desktop Video (Hidden on mobile) */}
             <video
               autoPlay
               loop
               muted
               playsInline
-              // Added 'brightness-100' to ensure full clarity.
-              // 'object-cover' ensures it fills the screen without stretching.
-              className="w-full h-full object-cover object-[center_bottom] brightness-125 contrast-110"
+              className="hidden md:block w-full h-full object-cover object-center scale-105"
             >
               <source src="/videos/video.mp4" type="video/mp4" />
             </video>
 
-            {/* MINIMAL OVERLAY: 
-           Removed the heavy full-screen dark gradient.
-           Added a very short gradient ONLY at the bottom (h-32) 
-           so the white text is readable if the video floor is white.
-           The rest of the video is 100% clear.
-        */}
-            <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-black/70 to-transparent z-10 pointer-events-none" />
+            {/* Mobile Video (Hidden on desktop) */}
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="block md:hidden w-full h-full object-cover object-center scale-105"
+            >
+              <source src="/videos/video.mp4" type="video/mp4" />
+            </video>
+
+            {/* VERY MINIMAL OVERLAY: 
+                Only at the bottom to make text readable. 
+                Added a super thin 10% black overlay globally just to remove any harsh bright spots 
+                without losing video quality.
+            */}
+            <div className="absolute inset-0 bg-black/10 z-0 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10 pointer-events-none" />
           </div>
 
           {/* ==============================
           TEXT CONTENT (Minimal & Small)
-      ============================== */}
+          ============================== */}
           <motion.div
             style={{ opacity: opacityText }}
             className="relative z-20 h-full flex flex-col justify-end items-start px-6 pb-12 md:px-16 md:pb-16"
@@ -320,10 +330,10 @@ export default function Home() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
-                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-4"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-4 shadow-lg"
               >
                 <Sparkles size={12} className="text-pink-400" />
-                <span className="text-[10px] md:text-xs font-semibold uppercase tracking-wider text-white">
+                <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-white">
                   Authorized Hyundai Mobis Distributor
                 </span>
               </motion.div>
@@ -333,7 +343,7 @@ export default function Home() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight drop-shadow-lg"
+                className="text-3xl md:text-5xl font-black tracking-tight text-white leading-tight drop-shadow-2xl"
               >
                 Genuine{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-pink-400">
@@ -346,7 +356,7 @@ export default function Home() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="mt-2 text-sm md:text-base text-white/80 font-light max-w-md drop-shadow-md"
+                className="mt-3 text-sm md:text-base text-gray-200 font-medium max-w-md drop-shadow-lg"
               >
                 Precision engineered components. Safety assured.
               </motion.p>
@@ -355,7 +365,7 @@ export default function Home() {
 
           {/* ==============================
           SCROLL INDICATOR (Minimal)
-      ============================== */}
+          ============================== */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -370,13 +380,15 @@ export default function Home() {
               }
               className="group flex flex-col items-center justify-center gap-1"
             >
-              <div className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center bg-black/20 backdrop-blur-sm group-hover:bg-white/20 transition-all duration-300">
-                <ArrowDown size={18} className="text-white" />
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/40 flex items-center justify-center bg-black/30 backdrop-blur-md group-hover:bg-white/20 transition-all duration-300 shadow-xl">
+                <ArrowDown
+                  size={18}
+                  className="text-white group-hover:translate-y-1 transition-transform"
+                />
               </div>
             </button>
           </motion.div>
         </section>
-
         {/* ================= DYNAMIC SECTIONS ================= */}
         <div className="w-full">
           <FestivalCarousel />
@@ -385,40 +397,49 @@ export default function Home() {
         <GarageSection />
 
         {/* ================= CATEGORIES ================= */}
-        <section className="container mx-auto px-4 mb-24">
-          <div className="flex items-center justify-between mb-10">
-            <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+        <section className="container mx-auto px-4 py-8 mb-5 md:mb-4">
+          {/* Header Section */}
+          <div className="flex items-center justify-between mb-6 md:mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
               Shop by Category
             </h2>
             <Link
               href="#"
-              className="text-indigo-600 dark:text-pink-400 text-xs font-bold uppercase tracking-wider hover:underline flex items-center gap-1"
+              className="text-indigo-600 dark:text-pink-400 text-xs sm:text-sm font-bold uppercase tracking-wider hover:underline flex items-center gap-1 transition-all"
             >
-              View All <ChevronRight size={14} />
+              View All <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+          {/* Grid Section */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
             {VISUAL_CATEGORIES.map((cat, i) => (
               <motion.div
                 key={i}
                 whileHover={{ y: -8, scale: 1.02 }}
-                className="group relative p-[1px] rounded-[1.5rem] bg-gradient-to-b from-white/60 to-white/20 dark:from-white/10 dark:to-transparent shadow-lg hover:shadow-xl cursor-pointer transition-all duration-300"
+                whileTap={{ scale: 0.96 }} // 🔥 మొబైల్ లో టచ్ చేసినప్పుడు మంచి ఫీల్ కోసం
+                className="group relative p-[1px] rounded-2xl sm:rounded-[1.5rem] bg-gradient-to-b from-white/60 to-white/20 dark:from-white/10 dark:to-transparent shadow-md hover:shadow-xl cursor-pointer transition-all duration-300"
               >
-                <div className="h-full bg-white dark:bg-[#1a0b2e] rounded-[1.4rem] p-6 flex flex-col items-center text-center gap-4 relative overflow-hidden">
+                {/* Card Content */}
+                <div className="h-full bg-white dark:bg-[#1a0b2e] rounded-2xl sm:rounded-[1.4rem] p-4 sm:p-5 md:p-6 flex flex-col items-center text-center gap-3 md:gap-4 relative overflow-hidden">
+                  {/* Background Hover Effect */}
                   <div
                     className={`absolute inset-0 bg-gradient-to-br ${cat.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
                   />
+
+                  {/* Icon */}
                   <div
-                    className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${cat.color} flex items-center justify-center text-white shadow-md group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300`}
+                    className={`w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br ${cat.color} flex items-center justify-center text-white shadow-md group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0`}
                   >
                     {cat.icon}
                   </div>
-                  <div className="relative z-10">
-                    <h4 className="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-wide group-hover:text-indigo-600 dark:group-hover:text-pink-400 transition-colors">
+
+                  {/* Text */}
+                  <div className="relative z-10 flex flex-col items-center">
+                    <h4 className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm md:text-base uppercase tracking-wide group-hover:text-indigo-600 dark:group-hover:text-pink-400 transition-colors line-clamp-1">
                       {cat.name}
                     </h4>
-                    <p className="text-[10px] text-slate-500 dark:text-gray-400 mt-1 font-medium">
+                    <p className="text-[10px] sm:text-xs text-slate-500 dark:text-gray-400 mt-1 font-medium leading-snug line-clamp-2">
                       {cat.desc}
                     </p>
                   </div>
