@@ -1765,13 +1765,21 @@ export default function VisualPartsFinder() {
 
         @media (max-width: 768px) {
           .vpf-section {
-            padding: 4rem 1rem;
+            padding: 1.5rem 0.5rem; /* పైన, కింద గ్యాప్ తగ్గించాను */
+            min-height: auto; /* అనవసరమైన ఖాళీ స్థలాన్ని తీసేస్తుంది */
+          }
+          .vpf-header {
+            margin-bottom: 1.5rem; /* టెక్స్ట్ కి మరియు ఇమేజ్ కి మధ్య గ్యాప్ తగ్గించాను */
           }
           .vpf-title {
-            font-size: 2rem;
+            font-size: 1.8rem;
+          }
+          .vpf-subtitle {
+            font-size: 0.9rem;
           }
           .vpf-blueprint-card {
-            padding: 1rem;
+            padding: 0.5rem; /* కార్డ్ లోపల గ్యాప్ తగ్గించాను */
+            border-radius: 20px; /* మొబైల్ కి తగ్గట్టుగా మూలలు మార్చాను */
           }
           .vpf-tooltip {
             width: 170px;
