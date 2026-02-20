@@ -6,7 +6,7 @@
 // import { useStore } from "@/store/useStore";
 // import { useAuth } from "@/hooks/useAuth";
 // import { usePathname } from "next/navigation";
-// import toast from "react-hot-toast"; // Ensure react-hot-toast is installed
+// import { GarageModal } from "./GarageModal"; // ✅ Import Modal here
 // import {
 //   ShoppingCart,
 //   Menu,
@@ -20,7 +20,7 @@
 //   Search,
 //   User,
 //   ChevronRight,
-//   Car, // ✅ Added Car Icon
+//   Car,
 // } from "lucide-react";
 
 // export const Navbar = () => {
@@ -32,63 +32,24 @@
 //     toggleCartDrawer,
 //     isMobileMenuOpen,
 //     toggleMobileMenu,
+//     selectedVehicle, // ✅ Store నుండి కారు డేటా తీసుకుంటున్నాం
 //   } = useStore();
+
 //   const { user, isAuthenticated, logout } = useAuth();
 
-//   // --- 🚗 MY GARAGE STATE & LOGIC ---
-//   const [userGarage, setUserGarage] = useState<{
-//     model: string;
-//     year: number;
-//   } | null>(null);
+//   // Modal State only (Logic is moved to Store & Component)
 //   const [isGarageModalOpen, setIsGarageModalOpen] = useState(false);
-//   const [garageForm, setGarageForm] = useState({ model: "", year: "" });
 
-//   // Load Garage from Local Storage
+//   // Scroll Effect
 //   useEffect(() => {
 //     const handleScroll = () => {
 //       setScrolled(window.scrollY > 20);
 //     };
 //     window.addEventListener("scroll", handleScroll);
-
-//     // Check Local Storage
-//     const savedGarage = localStorage.getItem("myGarage");
-//     if (savedGarage) {
-//       setUserGarage(JSON.parse(savedGarage));
-//     }
-
-//     // Listen for storage events (to sync if changed in another tab/component)
-//     const handleStorageChange = () => {
-//       const updated = localStorage.getItem("myGarage");
-//       setUserGarage(updated ? JSON.parse(updated) : null);
-//     };
-//     window.addEventListener("storage", handleStorageChange);
-
 //     return () => {
 //       window.removeEventListener("scroll", handleScroll);
-//       window.removeEventListener("storage", handleStorageChange);
 //     };
 //   }, []);
-
-//   const saveGarage = () => {
-//     if (!garageForm.model || !garageForm.year) {
-//       toast.error("Please fill all fields");
-//       return;
-//     }
-//     const car = { model: garageForm.model, year: parseInt(garageForm.year) };
-//     localStorage.setItem("myGarage", JSON.stringify(car));
-//     setUserGarage(car);
-//     setIsGarageModalOpen(false);
-//     toast.success("Garage updated!");
-//   };
-
-//   const removeGarage = () => {
-//     localStorage.removeItem("myGarage");
-//     setUserGarage(null);
-//     setGarageForm({ model: "", year: "" });
-//     toast.success("Car removed from garage");
-//   };
-
-//   // -----------------------------------
 
 //   const pathname = usePathname();
 //   if (
@@ -96,10 +57,15 @@
 //     pathname === "/register" ||
 //     pathname === "/forgot-password" ||
 //     pathname?.startsWith("/admin") ||
-//     pathname === "/chat"
+//     pathname === "/chat" ||
+//     pathname === "/checkout" ||
+//     pathname?.startsWith("/reset-password") ||
+//     pathname?.startsWith("/verify-email")
 //   ) {
 //     return null;
 //   }
+
+//   const isAdmin = user?.role === "admin";
 
 //   return (
 //     <>
@@ -141,7 +107,9 @@
 //             <div className="hidden md:flex items-center gap-8">
 //               <NavLink href="/products">Products</NavLink>
 //               <NavLink href="/categories">Categories</NavLink>
-//               {isAuthenticated && <NavLink href="/orders">Orders</NavLink>}
+//               {isAuthenticated && !isAdmin && (
+//                 <NavLink href="/orders">Orders</NavLink>
+//               )}
 //             </div>
 
 //             {/* Right actions */}
@@ -159,53 +127,65 @@
 //                 )}
 //               </motion.button>
 
-//               {/* ✅ NEW: My Garage Icon (Desktop) */}
-//               <motion.button
-//                 whileTap={{ scale: 0.9 }}
-//                 onClick={() => setIsGarageModalOpen(true)}
-//                 className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors relative hidden sm:flex"
-//                 title="My Garage"
-//               >
-//                 <Car
-//                   size={20}
-//                   className={
-//                     userGarage ? "text-cyan-600 dark:text-cyan-400" : ""
-//                   }
-//                 />
-//                 {userGarage && (
-//                   <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-cyan-500 rounded-full ring-2 ring-white dark:ring-[#050B14]"></span>
-//                 )}
-//               </motion.button>
-
-//               {/* Wishlist */}
-//               <Link href="/wishlist">
-//                 <motion.button
-//                   whileTap={{ scale: 0.9 }}
-//                   className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors"
-//                 >
-//                   <Heart size={20} />
-//                 </motion.button>
-//               </Link>
-
-//               {/* Cart */}
-//               <motion.button
-//                 whileTap={{ scale: 0.9 }}
-//                 onClick={toggleCartDrawer}
-//                 className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors"
-//               >
-//                 <ShoppingCart size={20} />
-//                 {cartItemCount > 0 && (
-//                   <motion.div
-//                     initial={{ scale: 0 }}
-//                     animate={{ scale: 1 }}
-//                     className="absolute -top-0.5 -right-0.5 bg-blue-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm border-2 border-white dark:border-[#050B14]"
+//               {!isAdmin && (
+//                 <>
+//                   {/* My Garage Button (Desktop) */}
+//                   <motion.button
+//                     whileTap={{ scale: 0.9 }}
+//                     onClick={() => setIsGarageModalOpen(true)}
+//                     className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors relative hidden sm:flex items-center gap-2"
+//                     title="My Garage"
 //                   >
-//                     {cartItemCount}
-//                   </motion.div>
-//                 )}
-//               </motion.button>
+//                     <Car
+//                       size={20}
+//                       className={
+//                         selectedVehicle
+//                           ? "text-cyan-600 dark:text-cyan-400"
+//                           : ""
+//                       }
+//                     />
+//                     {/* కారు సెలెక్ట్ చేస్తే గ్రీన్ డాట్ బదులు టెక్స్ట్ చూపిస్తున్నాం */}
+//                     {selectedVehicle && (
+//                       <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400 hidden lg:block">
+//                         {selectedVehicle.model}
+//                       </span>
+//                     )}
+//                     {!selectedVehicle && (
+//                       <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+//                     )}
+//                   </motion.button>
 
-//               {/* User Menu (Desktop Dropdown) */}
+//                   {/* Wishlist */}
+//                   <Link href="/wishlist">
+//                     <motion.button
+//                       whileTap={{ scale: 0.9 }}
+//                       className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors"
+//                     >
+//                       <Heart size={20} />
+//                     </motion.button>
+//                   </Link>
+
+//                   {/* Cart */}
+//                   <motion.button
+//                     whileTap={{ scale: 0.9 }}
+//                     onClick={toggleCartDrawer}
+//                     className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors"
+//                   >
+//                     <ShoppingCart size={20} />
+//                     {cartItemCount > 0 && (
+//                       <motion.div
+//                         initial={{ scale: 0 }}
+//                         animate={{ scale: 1 }}
+//                         className="absolute -top-0.5 -right-0.5 bg-blue-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm border-2 border-white dark:border-[#050B14]"
+//                       >
+//                         {cartItemCount}
+//                       </motion.div>
+//                     )}
+//                   </motion.button>
+//                 </>
+//               )}
+
+//               {/* User Menu */}
 //               {isAuthenticated ? (
 //                 <div className="relative group hidden md:block ml-2">
 //                   <div className="cursor-pointer py-2">
@@ -238,11 +218,13 @@
 //                           icon={User}
 //                           label="Profile"
 //                         />
-//                         <DropdownLink
-//                           href="/orders"
-//                           icon={Package}
-//                           label="My Orders"
-//                         />
+//                         {!isAdmin && (
+//                           <DropdownLink
+//                             href="/orders"
+//                             icon={Package}
+//                             label="My Orders"
+//                           />
+//                         )}
 //                         <div className="my-1 border-t border-gray-100 dark:border-white/5" />
 //                         <button
 //                           onClick={logout}
@@ -279,7 +261,7 @@
 //         </div>
 //       </motion.nav>
 
-//       {/* Mobile Menu Overlay (Beautiful Drawer) */}
+//       {/* Mobile Menu Overlay */}
 //       <AnimatePresence>
 //         {isMobileMenuOpen && (
 //           <>
@@ -297,7 +279,7 @@
 //               transition={{ type: "spring", damping: 30, stiffness: 300 }}
 //               className="fixed right-0 top-0 bottom-0 w-[85%] max-w-[320px] bg-white dark:bg-[#0F172A] shadow-2xl z-50 md:hidden flex flex-col"
 //             >
-//               {/* Drawer Header with Close Button */}
+//               {/* Drawer Header */}
 //               <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-white/5">
 //                 <span className="font-bold text-lg text-gray-900 dark:text-white">
 //                   Menu
@@ -311,7 +293,6 @@
 //               </div>
 
 //               <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-//                 {/* User Info Card */}
 //                 {isAuthenticated ? (
 //                   <div className="mb-8 p-5 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/20">
 //                     <div className="flex items-center gap-4">
@@ -354,33 +335,54 @@
 //                     All Products
 //                   </MobileLink>
 
-//                   {/* ✅ NEW: Mobile My Garage Link */}
-//                   <button
-//                     onClick={() => {
-//                       toggleMobileMenu();
-//                       setIsGarageModalOpen(true);
-//                     }}
-//                     className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-white/5 rounded-xl transition-all active:scale-95 group"
-//                   >
-//                     <div className="flex items-center gap-3">
-//                       <div
-//                         className={`p-2 rounded-lg bg-gray-100 dark:bg-white/5 group-hover:bg-blue-100 dark:group-hover:bg-blue-500/20 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors ${userGarage ? "text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-900/20" : ""}`}
+//                   {!isAdmin && (
+//                     <>
+//                       {/* Mobile Garage Button */}
+//                       <button
+//                         onClick={() => {
+//                           toggleMobileMenu();
+//                           setIsGarageModalOpen(true);
+//                         }}
+//                         className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-white/5 rounded-xl transition-all active:scale-95 group"
 //                       >
-//                         <Car size={18} />
-//                       </div>
-//                       <span
-//                         className={
-//                           userGarage ? "text-cyan-700 dark:text-cyan-300" : ""
-//                         }
+//                         <div className="flex items-center gap-3">
+//                           <div
+//                             className={`p-2 rounded-lg bg-gray-100 dark:bg-white/5 group-hover:bg-blue-100 dark:group-hover:bg-blue-500/20 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors ${
+//                               selectedVehicle
+//                                 ? "text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-900/20"
+//                                 : ""
+//                             }`}
+//                           >
+//                             <Car size={18} />
+//                           </div>
+//                           <span
+//                             className={
+//                               selectedVehicle
+//                                 ? "text-cyan-700 dark:text-cyan-300"
+//                                 : ""
+//                             }
+//                           >
+//                             My Garage{" "}
+//                             {selectedVehicle
+//                               ? `(${selectedVehicle.model})`
+//                               : ""}
+//                           </span>
+//                         </div>
+//                         <ChevronRight
+//                           size={16}
+//                           className="text-gray-300 dark:text-gray-600 group-hover:text-blue-500"
+//                         />
+//                       </button>
+
+//                       <MobileLink
+//                         href="/wishlist"
+//                         icon={Heart}
+//                         onClick={toggleMobileMenu}
 //                       >
-//                         My Garage {userGarage ? `(${userGarage.model})` : ""}
-//                       </span>
-//                     </div>
-//                     <ChevronRight
-//                       size={16}
-//                       className="text-gray-300 dark:text-gray-600 group-hover:text-blue-500"
-//                     />
-//                   </button>
+//                         My Wishlist
+//                       </MobileLink>
+//                     </>
+//                   )}
 
 //                   <MobileLink
 //                     href="/categories"
@@ -389,13 +391,6 @@
 //                   >
 //                     Categories
 //                   </MobileLink>
-//                   <MobileLink
-//                     href="/wishlist"
-//                     icon={Heart}
-//                     onClick={toggleMobileMenu}
-//                   >
-//                     My Wishlist
-//                   </MobileLink>
 
 //                   {isAuthenticated && (
 //                     <>
@@ -403,13 +398,15 @@
 //                       <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">
 //                         Account
 //                       </p>
-//                       <MobileLink
-//                         href="/orders"
-//                         icon={Package}
-//                         onClick={toggleMobileMenu}
-//                       >
-//                         My Orders
-//                       </MobileLink>
+//                       {!isAdmin && (
+//                         <MobileLink
+//                           href="/orders"
+//                           icon={Package}
+//                           onClick={toggleMobileMenu}
+//                         >
+//                           My Orders
+//                         </MobileLink>
+//                       )}
 //                       <MobileLink
 //                         href="/profile"
 //                         icon={Settings}
@@ -423,7 +420,6 @@
 
 //                 {/* Footer Actions */}
 //                 <div className="pt-6 mt-auto border-t border-gray-100 dark:border-white/5 space-y-3">
-//                   {/* Theme Toggle Button Mobile */}
 //                   <button
 //                     onClick={toggleTheme}
 //                     className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-white/5"
@@ -459,106 +455,16 @@
 //         )}
 //       </AnimatePresence>
 
-//       {/* 🚙 GARAGE GLOBAL MODAL POPUP */}
-//       <AnimatePresence>
-//         {isGarageModalOpen && (
-//           <>
-//             <motion.div
-//               initial={{ opacity: 0 }}
-//               animate={{ opacity: 1 }}
-//               exit={{ opacity: 0 }}
-//               onClick={() => setIsGarageModalOpen(false)}
-//               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-//             />
-//             <motion.div
-//               initial={{ opacity: 0, scale: 0.9, y: 20 }}
-//               animate={{ opacity: 1, scale: 1, y: 0 }}
-//               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-//               className="fixed inset-0 m-auto w-[90%] max-w-md h-fit p-6 bg-white dark:bg-[#121212] border border-gray-200 dark:border-white/10 rounded-3xl shadow-2xl z-[101]"
-//             >
-//               <div className="flex justify-between items-center mb-6">
-//                 <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-//                   <Car className="text-cyan-600" />
-//                   {userGarage ? "Your Garage" : "Add Your Car"}
-//                 </h2>
-//                 <button
-//                   onClick={() => setIsGarageModalOpen(false)}
-//                   className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full"
-//                 >
-//                   <X size={20} className="text-gray-500" />
-//                 </button>
-//               </div>
-
-//               {userGarage ? (
-//                 // View Mode
-//                 <div className="text-center">
-//                   <div className="bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-100 dark:border-cyan-800/30 rounded-2xl p-6 mb-6">
-//                     <Car
-//                       size={48}
-//                       className="mx-auto text-cyan-600 dark:text-cyan-400 mb-3"
-//                     />
-//                     <h3 className="text-xl font-black text-gray-900 dark:text-white">
-//                       Hyundai {userGarage.model}
-//                     </h3>
-//                     <p className="text-gray-500 dark:text-gray-400">
-//                       {userGarage.year}
-//                     </p>
-//                   </div>
-//                   <button
-//                     onClick={removeGarage}
-//                     className="w-full py-3 border border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 font-bold rounded-xl hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
-//                   >
-//                     Change Vehicle
-//                   </button>
-//                 </div>
-//               ) : (
-//                 // Edit Mode
-//                 <div className="space-y-4">
-//                   <div>
-//                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-//                       Car Model
-//                     </label>
-//                     <input
-//                       type="text"
-//                       placeholder="e.g. Creta, Swift, City"
-//                       value={garageForm.model}
-//                       onChange={(e) =>
-//                         setGarageForm({ ...garageForm, model: e.target.value })
-//                       }
-//                       className="w-full p-3 bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-xl focus:outline-none focus:border-cyan-500 transition-colors text-gray-900 dark:text-white"
-//                     />
-//                   </div>
-//                   <div>
-//                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-//                       Year
-//                     </label>
-//                     <input
-//                       type="number"
-//                       placeholder="e.g. 2020"
-//                       value={garageForm.year}
-//                       onChange={(e) =>
-//                         setGarageForm({ ...garageForm, year: e.target.value })
-//                       }
-//                       className="w-full p-3 bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-xl focus:outline-none focus:border-cyan-500 transition-colors text-gray-900 dark:text-white"
-//                     />
-//                   </div>
-//                   <button
-//                     onClick={saveGarage}
-//                     className="w-full py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl shadow-lg shadow-cyan-500/20 transition-all mt-2"
-//                   >
-//                     Save Vehicle
-//                   </button>
-//                 </div>
-//               )}
-//             </motion.div>
-//           </>
-//         )}
-//       </AnimatePresence>
+//       {/* ✅ NEW: Garage Modal Component (Clean Integration) */}
+//       <GarageModal
+//         isOpen={isGarageModalOpen}
+//         onClose={() => setIsGarageModalOpen(false)}
+//       />
 //     </>
 //   );
 // };
 
-// // 🛠️ Helper Components
+// // 🛠️ Helper Components (No Changes Needed Here)
 
 // function NavLink({
 //   href,
@@ -640,7 +546,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useStore } from "@/store/useStore";
 import { useAuth } from "@/hooks/useAuth";
 import { usePathname } from "next/navigation";
-import { GarageModal } from "./GarageModal"; // ✅ Import Modal here
+import { GarageModal } from "./GarageModal";
 import {
   ShoppingCart,
   Menu,
@@ -658,7 +564,8 @@ import {
 } from "lucide-react";
 
 export const Navbar = () => {
-  const [scrolled, setScrolled] = useState(false);
+  // 🔥 UPDATED: scrolled బదులు showNavbar వాడుతున్నాం
+  const [showNavbar, setShowNavbar] = useState(false);
   const {
     theme,
     toggleTheme,
@@ -666,19 +573,27 @@ export const Navbar = () => {
     toggleCartDrawer,
     isMobileMenuOpen,
     toggleMobileMenu,
-    selectedVehicle, // ✅ Store నుండి కారు డేటా తీసుకుంటున్నాం
+    selectedVehicle,
   } = useStore();
 
   const { user, isAuthenticated, logout } = useAuth();
-
-  // Modal State only (Logic is moved to Store & Component)
   const [isGarageModalOpen, setIsGarageModalOpen] = useState(false);
 
-  // Scroll Effect
+  // 🔥 UPDATED: Scroll Effect (Hide on Top, Show on Scroll)
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      // 200 పిక్సెల్స్ కిందకు స్క్రోల్ చేస్తే నావ్ బార్ కనిపిస్తుంది.
+      // (లేదా హోమ్ పేజీ కాకుండా వేరే పేజీలో ఉంటే ఎప్పుడూ కనబడేలా కూడా పెట్టుకోవచ్చు)
+      if (window.scrollY > 200) {
+        setShowNavbar(true);
+      } else {
+        setShowNavbar(false);
+      }
     };
+
+    // Page load అయిన వెంటనే ఒకసారి చెక్ చేయడానికి
+    handleScroll();
+
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -686,6 +601,12 @@ export const Navbar = () => {
   }, []);
 
   const pathname = usePathname();
+
+  // ఒకవేళ హోమ్ పేజీలో కాకుండా వేరే పేజీలలో ఎప్పుడూ Navbar కనబడాలి అనుకుంటే ఇది వాడండి
+  const isHomePage = pathname === "/";
+  // హోమ్ పేజీలో ఉంటే స్క్రోల్ బట్టి, వేరే పేజీలలో ఉంటే ఎప్పుడూ (లేదా మొబైల్ మెనూ ఓపెన్ ఉంటే) కనబడుతుంది.
+  const isVisible = (isHomePage ? showNavbar : true) || isMobileMenuOpen;
+
   if (
     pathname === "/login" ||
     pathname === "/register" ||
@@ -704,14 +625,11 @@ export const Navbar = () => {
   return (
     <>
       <motion.nav
+        // 🔥 UPDATED: Navbar హైడ్/షో యానిమేషన్ లాజిక్
         initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled || isMobileMenuOpen
-            ? "h-16 bg-white/90 dark:bg-[#050B14]/90 backdrop-blur-xl shadow-sm"
-            : "h-20 bg-transparent"
-        }`}
+        animate={{ y: isVisible ? 0 : -100 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className={`fixed top-0 left-0 right-0 z-50 h-16 bg-white/90 dark:bg-[#050B14]/90 backdrop-blur-xl shadow-sm`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
           <div className="flex items-center justify-between h-full">
@@ -778,7 +696,6 @@ export const Navbar = () => {
                           : ""
                       }
                     />
-                    {/* కారు సెలెక్ట్ చేస్తే గ్రీన్ డాట్ బదులు టెక్స్ట్ చూపిస్తున్నాం */}
                     {selectedVehicle && (
                       <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400 hidden lg:block">
                         {selectedVehicle.model}
@@ -1089,7 +1006,7 @@ export const Navbar = () => {
         )}
       </AnimatePresence>
 
-      {/* ✅ NEW: Garage Modal Component (Clean Integration) */}
+      {/* ✅ NEW: Garage Modal Component */}
       <GarageModal
         isOpen={isGarageModalOpen}
         onClose={() => setIsGarageModalOpen(false)}
