@@ -88,6 +88,7 @@ export default function ProfilePage() {
       if (response.data.success) {
         toast.success("Profile updated successfully", { icon: "✨" });
         setIsEditing(false);
+        await refreshUser();
       }
     } catch (error: any) {
       toast.error(error.response?.data?.error || "Failed to update profile");

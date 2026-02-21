@@ -755,6 +755,7 @@ import { useRouter } from "next/navigation";
 import { wishlistAPI } from "@/lib/api/wishlist";
 import { TrustBadges } from "@/components/TrustBadges";
 import Image from "next/image";
+import PhoneBanner from "@/components/PhoneBanner";
 
 // 🔥 DYNAMIC IMPORTS (Optimized for Performance)
 const VisualPartsFinder = dynamic(
@@ -1010,7 +1011,7 @@ export default function Home() {
         <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-indigo-300/20 dark:bg-purple-600/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-[20%] right-[-5%] w-[500px] h-[500px] bg-pink-300/20 dark:bg-pink-600/10 rounded-full blur-[100px]" />
       </div>
-
+      <PhoneBanner />
       <main className="relative z-10">
         {/* ================= HERO SECTION ================= */}
         <section

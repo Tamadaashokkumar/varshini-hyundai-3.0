@@ -11,6 +11,7 @@ export default function PhoneWarningModal() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
+    console.log(user);
     // యూజర్ లాగిన్ అయ్యి ఉండి, ఫోన్ నెంబర్ డమ్మీగా ఉంటేనే పాప్-అప్ ఓపెన్ అవ్వాలి
     if (!loading && user && user.phone === "0000000000") {
       setIsOpen(true);

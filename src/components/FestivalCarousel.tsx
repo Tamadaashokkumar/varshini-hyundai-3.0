@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-// 🔥 UPDATED: axios బదులు మీ apiClient వాడుతున్నాం, ప్రొడక్షన్ కి సేఫ్
 import apiClient from "@/services/apiClient";
 import { ArrowRight, Sparkles, Tag } from "lucide-react";
 import Link from "next/link";
@@ -29,31 +28,28 @@ interface ApiResponse {
   data: CarouselItem[];
 }
 
-// 🔥 Premium Slide Transition
+// 🔥 Mobile Optimized Slide Transition
 const slideVariants = {
   enter: {
     x: "100%",
-    opacity: 0.5,
+    opacity: 0,
     zIndex: 1,
-    scale: 0.95,
   },
   center: {
     x: 0,
     opacity: 1,
     zIndex: 2,
-    scale: 1,
     transition: {
-      duration: 1.2,
+      duration: 0.8,
       ease: [0.16, 1, 0.3, 1],
     },
   },
   exit: {
-    x: "-30%",
+    x: "-20%",
     opacity: 0,
     zIndex: 0,
-    scale: 1.05,
     transition: {
-      duration: 1,
+      duration: 0.8,
       ease: [0.16, 1, 0.3, 1],
     },
   },
@@ -68,11 +64,9 @@ const FestivalCarousel = () => {
   useEffect(() => {
     const fetchCarousels = async () => {
       try {
-        // 🔥 UPDATED: localhost తీసేసి apiClient వాడాము
         const response = await apiClient.get<ApiResponse>("/carousel");
 
         if (response.data?.success) {
-          // కేవలం isActive ఉన్నవి మాత్రమే చూపించడానికి ఫిల్టర్ చేయొచ్చు (ఆప్షనల్)
           const activeSlides = response.data.data.filter(
             (slide) => slide.isActive !== false,
           );
@@ -98,16 +92,15 @@ const FestivalCarousel = () => {
     return () => clearInterval(interval);
   }, [current, slides.length]);
 
-  // --- Staggered Text Animations ---
+  // --- Staggered Text Animations (Blur Removed for Mobile Speed) ---
   const textVariants = {
-    hidden: { opacity: 0, y: 30, filter: "blur(8px)" },
+    hidden: { opacity: 0, y: 30 },
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
-      filter: "blur(0px)",
       transition: {
-        delay: 0.5 + i * 0.15,
-        duration: 0.8,
+        delay: 0.3 + i * 0.15,
+        duration: 0.6,
         ease: [0.22, 1, 0.36, 1],
       },
     }),
@@ -143,7 +136,7 @@ const FestivalCarousel = () => {
             {currentSlide.image && (
               <motion.div
                 initial={{ scale: 1 }}
-                animate={{ scale: 1.1 }}
+                animate={{ scale: 1.05 }} // స్కేల్ కొంచెం తగ్గించాం
                 transition={{ duration: 10, ease: "linear" }}
                 className="absolute inset-0 w-full h-full"
               >
@@ -152,16 +145,16 @@ const FestivalCarousel = () => {
                   alt={currentSlide.title || "Festival Banner"}
                   fill
                   sizes="100vw"
-                  className="object-cover object-center"
+                  className="object-cover object-center" // 🔥 opacity తీసేశాం, ఒరిజినల్ క్వాలిటీ వస్తుంది
                   priority={current === 0}
-                  quality={85}
+                  quality={75}
                 />
               </motion.div>
             )}
 
-            {/* 🔥 PREMIUM OVERLAYS FOR READABILITY */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent z-10" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 z-10 sm:hidden" />
+            {/* 🔥 PREMIUM OVERLAYS */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 z-10 sm:hidden pointer-events-none" />
           </div>
 
           {/* ================= CONTENT LAYER ================= */}
@@ -195,7 +188,7 @@ const FestivalCarousel = () => {
                 variants={textVariants}
                 initial="hidden"
                 animate="visible"
-                className="text-5xl sm:text-7xl lg:text-8xl font-black text-white leading-[1.05] tracking-tighter mb-5 drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
+                className="text-4xl sm:text-6xl lg:text-8xl font-black text-white leading-[1.1] tracking-tighter mb-5 drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
               >
                 {currentSlide.title}
               </motion.h1>
@@ -209,14 +202,14 @@ const FestivalCarousel = () => {
                 className="mb-8 space-y-4"
               >
                 {currentSlide.subtitle && (
-                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-light text-gray-200 tracking-tight drop-shadow-lg">
+                  <h3 className="text-xl sm:text-3xl lg:text-4xl font-light text-gray-200 tracking-tight drop-shadow-lg">
                     {currentSlide.subtitle}
                   </h3>
                 )}
                 {currentSlide.description && (
                   <div className="relative pl-5 border-l-4 border-pink-500 max-w-xl">
-                    <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-pink-500/20 to-transparent -z-10 blur-md" />
-                    <p className="text-base sm:text-lg text-gray-300 font-medium leading-relaxed drop-shadow-md">
+                    <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-pink-500/20 to-transparent -z-10 blur-sm" />
+                    <p className="text-sm sm:text-lg text-gray-300 font-medium leading-relaxed drop-shadow-md">
                       {currentSlide.description}
                     </p>
                   </div>
@@ -232,14 +225,12 @@ const FestivalCarousel = () => {
                   animate="visible"
                 >
                   <Link href={currentSlide.link}>
-                    <button className="group relative px-8 py-4 sm:px-10 sm:py-4 bg-white text-black font-extrabold text-sm sm:text-base uppercase tracking-widest rounded-xl overflow-hidden transition-all hover:scale-105 hover:shadow-[0_10px_40px_rgba(255,255,255,0.4)] active:scale-95">
-                      {/* Hover Shine Effect */}
+                    <button className="group relative px-8 py-3.5 sm:px-10 sm:py-4 bg-white text-black font-extrabold text-sm sm:text-base uppercase tracking-widest rounded-xl overflow-hidden transition-all hover:scale-105 hover:shadow-[0_10px_40px_rgba(255,255,255,0.4)] active:scale-95">
                       <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-black/10 to-transparent group-hover:animate-[shimmer_1.5s_infinite]" />
-
                       <span className="relative z-10 flex items-center justify-center gap-3">
                         {currentSlide.buttonText || "Shop Now"}
                         <ArrowRight
-                          size={20}
+                          size={18}
                           className="group-hover:translate-x-1.5 transition-transform duration-300"
                         />
                       </span>
@@ -253,7 +244,7 @@ const FestivalCarousel = () => {
       </AnimatePresence>
 
       {/* --- Progress Indicators --- */}
-      <div className="absolute bottom-8 sm:bottom-12 left-6 sm:left-10 lg:left-20 z-30 flex gap-3">
+      <div className="absolute bottom-8 sm:bottom-12 left-6 sm:left-10 lg:left-20 z-30 flex gap-2 sm:gap-3">
         {slides.map((_, idx) => (
           <button
             key={idx}
@@ -261,15 +252,13 @@ const FestivalCarousel = () => {
             className="group relative py-2 outline-none flex items-center justify-center"
             aria-label={`Go to slide ${idx + 1}`}
           >
-            {/* Background Track */}
             <span
-              className={`block h-1.5 sm:h-2 rounded-full transition-all duration-700 ease-out ${
+              className={`block h-1.5 sm:h-2 rounded-full transition-all duration-500 ease-out ${
                 current === idx
-                  ? "w-12 sm:w-16 bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)]"
-                  : "w-3 sm:w-4 bg-white/30 group-hover:bg-white/60"
+                  ? "w-10 sm:w-16 bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)]"
+                  : "w-2 sm:w-4 bg-white/40 group-hover:bg-white/70"
               }`}
             >
-              {/* Active Loading Bar Effect */}
               {current === idx && (
                 <motion.span
                   initial={{ width: "0%" }}
@@ -283,7 +272,6 @@ const FestivalCarousel = () => {
         ))}
       </div>
 
-      {/* 🔥 UPDATED: Cleaned up style tag */}
       <style jsx>{`
         @keyframes shimmer {
           100% {
