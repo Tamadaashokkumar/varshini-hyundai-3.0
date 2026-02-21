@@ -1,8 +1,266 @@
+// import { useState, useCallback, useRef, useEffect } from "react";
+// import { useStore } from "@/store/useStore";
+// import apiClient from "@/services/apiClient";
+// import socketService from "@/services/socketService";
+// import toast from "react-hot-toast";
+
+// // ==================== INTERFACES ====================
+// export interface User {
+//   _id: string;
+//   id?: string;
+//   name: string;
+//   email: string;
+//   phone?: string;
+//   role: string;
+//   avatar?: string;
+//   isActive?: boolean;
+//   garage?: any[];
+//   [key: string]: any;
+// }
+
+// export interface LoginCredentials {
+//   email: string;
+//   password: string;
+// }
+
+// interface AuthResponse {
+//   success: boolean;
+//   data: {
+//     user: User;
+//   };
+//   message?: string;
+//   isAuthenticated?: boolean; // ఇది ఆప్షనల్ గా మార్చాను
+// }
+
+// // ==================== HOOK START ====================
+// export const useAuth = () => {
+//   const {
+//     user,
+//     setUser,
+//     isAuthInitialized,
+//     setAuthInitialized,
+//     logout: logoutStore,
+//   } = useStore();
+
+//   // ఒకవేళ ఆల్రెడీ గ్లోబల్ గా చెక్ అయిపోతే లోడింగ్ అబద్ధం కావాలి
+//   const [loading, setLoading] = useState<boolean>(!isAuthInitialized);
+
+//   const isChecking = useRef<boolean>(false);
+
+//   // 🔥 NEW FUNCTION: Socket ని Token తో కనెక్ట్ చేయడానికి హెల్పర్ ఫంక్షన్
+//   const connectSocketWithToken = useCallback(async () => {
+//     try {
+//       // 1. Backend నుండి Token తెచ్చుకోవడం (Vercel Rewrite ద్వారా)
+//       const response = await apiClient.get("/auth/get-socket-token");
+
+//       if (response.data?.token) {
+//         console.log("[useAuth]: 🔌 Connecting socket with token...");
+//         // 2 & 3. టోకెన్ పాస్ చేసి కనెక్ట్ చేయడం (ఒకే లైన్ చాలు)
+//         socketService.connect(response.data.token);
+//       } else {
+//         console.log("⚠️ No token found, trying normal connect...");
+//         socketService.connect(); // ఒకవేళ టోకెన్ రాకపోతే నార్మల్ గా కనెక్ట్ అవ్వు
+//       }
+//     } catch (error) {
+//       console.error("⚠️ [useAuth]: Failed to connect socket with token", error);
+//       // ఫెయిల్ అయినా సరే ఉన్నదానితో కనెక్ట్ అవ్వడానికి ట్రై చేయి
+//       socketService.connect();
+//     }
+//   }, []);
+
+//   // ==================== CHECK AUTH STATUS ====================
+//   const checkAuthStatus = useCallback(async () => {
+//     if (isAuthInitialized || isChecking.current) {
+//       return;
+//     }
+
+//     console.log("[useAuth]: Checking session...");
+//     isChecking.current = true;
+//     setLoading(true);
+
+//     try {
+//       console.log("🔎 [useAuth]: Fetching check-session...");
+//       const response = await apiClient.get<AuthResponse>("/auth/check-session");
+
+//       // 🔥 FIX: isAuthenticated లేకపోయినా, success ఉండి యూజర్ డేటా ఉంటే లాగిన్ అయినట్లే!
+//       if (response.data.success && response.data.data?.user) {
+//         console.log(
+//           "[useAuth]: Session restored for:",
+//           response.data.data.user.email,
+//         );
+//         setUser(response.data.data.user as any);
+
+//         if (response.data.data.user?._id) {
+//           // socketService.connect();
+//           await connectSocketWithToken();
+//         }
+//       } else {
+//         console.log("[useAuth]: No valid session found.");
+//         setUser(null);
+//       }
+//     } catch (error: any) {
+//       console.error(
+//         "🚨 [useAuth]: Session Check Catch Block triggered!",
+//         error.response?.status,
+//       );
+//       console.error("[useAuth]: Auth check failed.");
+//       setUser(null);
+//     } finally {
+//       setAuthInitialized(true);
+//       setLoading(false);
+//       isChecking.current = false;
+//     }
+//   }, [setUser, isAuthInitialized, setAuthInitialized]);
+
+//   // పేజీ రీలోడ్ లేకుండా లేటెస్ట్ డేటాను సర్వర్ నుంచి తెచ్చి స్టోర్‌లో పెడుతుంది.
+//   const refreshUser = async () => {
+//     try {
+//       const response = await apiClient.get<AuthResponse>("/auth/check-session");
+//       if (response.data.success && response.data.data?.user) {
+//         console.log("Refreshing user data...");
+//         setUser(response.data.data.user as any); // Store Update
+//         return true;
+//       }
+//     } catch (error) {
+//       console.error("Failed to refresh user data", error);
+//     }
+//     return false;
+//   };
+
+//   useEffect(() => {
+//     if (!isAuthInitialized) {
+//       checkAuthStatus();
+//     }
+//   }, [isAuthInitialized, checkAuthStatus]);
+
+//   // ==================== LOGIN ====================
+//   const login = async (credentials: LoginCredentials) => {
+//     setLoading(true);
+//     try {
+//       const response = await apiClient.post<AuthResponse>(
+//         "/auth/login",
+//         credentials,
+//       );
+
+//       if (response.data.success && response.data.data?.user) {
+//         const userData = response.data.data.user;
+//         setUser(userData as any);
+//         setAuthInitialized(true);
+//         await connectSocketWithToken();
+//         toast.success(`Welcome back, ${userData.name}!`);
+//         return { success: true, user: userData };
+//       }
+//       return { success: false, error: "Invalid response from server" };
+//     } catch (error: any) {
+//       const errorMessage =
+//         error.response?.data?.error ||
+//         error.response?.data?.message ||
+//         "Login failed. Please try again.";
+
+//       // ఒకవేళ ఈమెయిల్ వెరిఫై కాకపోతే, ఆ మెసేజ్‌ను టోస్ట్ లాగా చూపిస్తాం
+//       toast.error(errorMessage);
+
+//       // ఎర్రర్ మెసేజ్‌ని రిటర్న్ చేస్తాం, తద్వారా Login Page లో కూడా చూపించవచ్చు
+//       return { success: false, error: errorMessage };
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // ==================== REGISTER ====================
+
+//   const register = async (data: any) => {
+//     setLoading(true);
+//     try {
+//       const response = await apiClient.post<AuthResponse>(
+//         "/auth/register",
+//         data,
+//       );
+
+//       // 🔥 ఇక్కడ మార్పు చేసాము:
+//       // ఇప్పుడు మనం ఆటోమేటిక్ లాగిన్ చేయడం లేదు, కేవలం రిజిస్ట్రేషన్ సక్సెస్ అని చెప్తున్నాం
+//       if (response.data.success) {
+//         // బ్యాకెండ్ నుండి వచ్చే సక్సెస్ మెసేజ్‌ను చూపిస్తాం (e.g., "Please check email...")
+//         toast.success(
+//           response.data.message ||
+//             "Registration successful! Please check your email.",
+//         );
+
+//         // యూజర్‌ను సెట్ చేయం (setUser వాడకూడదు), ఎందుకంటే అతను ఇంకా వెరిఫై అవ్వలేదు
+//         return { success: true };
+//       }
+
+//       return { success: false, error: "Registration failed" };
+//     } catch (error: any) {
+//       const errorMessage =
+//         error.response?.data?.error ||
+//         error.response?.data?.message ||
+//         "Registration failed.";
+//       toast.error(errorMessage);
+//       return { success: false, error: errorMessage };
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // ==================== LOGOUT ====================
+//   const logout = async () => {
+//     setLoading(true);
+//     try {
+//       await apiClient.post("/auth/logout");
+//     } catch (error) {
+//       console.error("Logout API failed", error);
+//     } finally {
+//       logoutStore();
+//       socketService.disconnect();
+//       toast.success("Logged out successfully");
+//       setLoading(false);
+//       if (typeof window !== "undefined") {
+//         window.location.href = "/login";
+//       }
+//     }
+//   };
+
+//   // ==================== UPDATE PROFILE ====================
+//   const updateProfile = async (data: any) => {
+//     setLoading(true);
+//     try {
+//       const response = await apiClient.put<AuthResponse>("/auth/profile", data);
+//       if (response.data.success && response.data.data?.user) {
+//         const updatedUser = response.data.data.user;
+//         setUser(updatedUser as any);
+//         toast.success("Profile updated!");
+//         return { success: true, user: updatedUser };
+//       }
+//       return { success: false, error: "Update failed" };
+//     } catch (error: any) {
+//       toast.error("Failed to update profile");
+//       return { success: false };
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return {
+//     user,
+//     loading,
+//     isAuthenticated: !!user,
+//     authChecked: isAuthInitialized,
+//     login,
+//     register,
+//     logout,
+//     updateProfile,
+//     checkAuthStatus,
+//     refreshUser,
+//   };
+// };
+
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useStore } from "@/store/useStore";
 import apiClient from "@/services/apiClient";
 import socketService from "@/services/socketService";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation"; // 🔥 UPDATE: Next.js Router for smooth transitions
 
 // ==================== INTERFACES ====================
 export interface User {
@@ -29,11 +287,13 @@ interface AuthResponse {
     user: User;
   };
   message?: string;
-  isAuthenticated?: boolean; // ఇది ఆప్షనల్ గా మార్చాను
+  isAuthenticated?: boolean;
 }
 
 // ==================== HOOK START ====================
 export const useAuth = () => {
+  const router = useRouter(); // 🔥 UPDATE: Router initialized
+
   const {
     user,
     setUser,
@@ -42,24 +302,20 @@ export const useAuth = () => {
     logout: logoutStore,
   } = useStore();
 
-  // ఒకవేళ ఆల్రెడీ గ్లోబల్ గా చెక్ అయిపోతే లోడింగ్ అబద్ధం కావాలి
   const [loading, setLoading] = useState<boolean>(!isAuthInitialized);
-
   const isChecking = useRef<boolean>(false);
 
-  // 🔥 NEW FUNCTION: Socket ని Token తో కనెక్ట్ చేయడానికి హెల్పర్ ఫంక్షన్
+  // 🔥 UPDATE: Socket ని Token తో కనెక్ట్ చేయడానికి హెల్పర్ ఫంక్షన్ (Non-blocking)
   const connectSocketWithToken = useCallback(async () => {
     try {
-      // 1. Backend నుండి Token తెచ్చుకోవడం (Vercel Rewrite ద్వారా)
       const response = await apiClient.get("/auth/get-socket-token");
 
       if (response.data?.token) {
         console.log("[useAuth]: 🔌 Connecting socket with token...");
-        // 2 & 3. టోకెన్ పాస్ చేసి కనెక్ట్ చేయడం (ఒకే లైన్ చాలు)
         socketService.connect(response.data.token);
       } else {
-        console.log("⚠️ No token found, trying normal connect...");
-        socketService.connect(); // ఒకవేళ టోకెన్ రాకపోతే నార్మల్ గా కనెక్ట్ అవ్వు
+        console.warn("⚠️ No token found, trying normal connect...");
+        socketService.connect();
       }
     } catch (error) {
       console.error("⚠️ [useAuth]: Failed to connect socket with token", error);
@@ -82,7 +338,6 @@ export const useAuth = () => {
       console.log("🔎 [useAuth]: Fetching check-session...");
       const response = await apiClient.get<AuthResponse>("/auth/check-session");
 
-      // 🔥 FIX: isAuthenticated లేకపోయినా, success ఉండి యూజర్ డేటా ఉంటే లాగిన్ అయినట్లే!
       if (response.data.success && response.data.data?.user) {
         console.log(
           "[useAuth]: Session restored for:",
@@ -91,34 +346,36 @@ export const useAuth = () => {
         setUser(response.data.data.user as any);
 
         if (response.data.data.user?._id) {
-          // socketService.connect();
-          await connectSocketWithToken();
+          // 🔥 FIX: await తీసేసాను, దీనివల్ల UI బ్లాక్ అవ్వదు
+          connectSocketWithToken();
         }
       } else {
         console.log("[useAuth]: No valid session found.");
         setUser(null);
       }
     } catch (error: any) {
-      console.error(
-        "🚨 [useAuth]: Session Check Catch Block triggered!",
-        error.response?.status,
-      );
-      console.error("[useAuth]: Auth check failed.");
+      // 401 Unauthorized ఎర్రర్స్ కామన్ (యూజర్ లాగిన్ అవ్వనప్పుడు), దాన్ని ఎర్రర్ లాగా కన్సోల్ లో చూపించద్దు
+      if (error.response?.status !== 401) {
+        console.error(
+          "🚨 [useAuth]: Session Check Catch Block triggered!",
+          error.response?.status,
+        );
+      }
       setUser(null);
     } finally {
       setAuthInitialized(true);
       setLoading(false);
       isChecking.current = false;
     }
-  }, [setUser, isAuthInitialized, setAuthInitialized]);
+  }, [setUser, isAuthInitialized, setAuthInitialized, connectSocketWithToken]);
 
-  // పేజీ రీలోడ్ లేకుండా లేటెస్ట్ డేటాను సర్వర్ నుంచి తెచ్చి స్టోర్‌లో పెడుతుంది.
+  // ==================== REFRESH USER ====================
   const refreshUser = async () => {
     try {
       const response = await apiClient.get<AuthResponse>("/auth/check-session");
       if (response.data.success && response.data.data?.user) {
         console.log("Refreshing user data...");
-        setUser(response.data.data.user as any); // Store Update
+        setUser(response.data.data.user as any);
         return true;
       }
     } catch (error) {
@@ -146,7 +403,10 @@ export const useAuth = () => {
         const userData = response.data.data.user;
         setUser(userData as any);
         setAuthInitialized(true);
-        await connectSocketWithToken();
+
+        // 🔥 FIX: await తీసేసాను, UI స్పీడ్ గా ఉంటుంది
+        connectSocketWithToken();
+
         toast.success(`Welcome back, ${userData.name}!`);
         return { success: true, user: userData };
       }
@@ -157,10 +417,7 @@ export const useAuth = () => {
         error.response?.data?.message ||
         "Login failed. Please try again.";
 
-      // ఒకవేళ ఈమెయిల్ వెరిఫై కాకపోతే, ఆ మెసేజ్‌ను టోస్ట్ లాగా చూపిస్తాం
       toast.error(errorMessage);
-
-      // ఎర్రర్ మెసేజ్‌ని రిటర్న్ చేస్తాం, తద్వారా Login Page లో కూడా చూపించవచ్చు
       return { success: false, error: errorMessage };
     } finally {
       setLoading(false);
@@ -168,7 +425,6 @@ export const useAuth = () => {
   };
 
   // ==================== REGISTER ====================
-
   const register = async (data: any) => {
     setLoading(true);
     try {
@@ -177,16 +433,11 @@ export const useAuth = () => {
         data,
       );
 
-      // 🔥 ఇక్కడ మార్పు చేసాము:
-      // ఇప్పుడు మనం ఆటోమేటిక్ లాగిన్ చేయడం లేదు, కేవలం రిజిస్ట్రేషన్ సక్సెస్ అని చెప్తున్నాం
       if (response.data.success) {
-        // బ్యాకెండ్ నుండి వచ్చే సక్సెస్ మెసేజ్‌ను చూపిస్తాం (e.g., "Please check email...")
         toast.success(
           response.data.message ||
             "Registration successful! Please check your email.",
         );
-
-        // యూజర్‌ను సెట్ చేయం (setUser వాడకూడదు), ఎందుకంటే అతను ఇంకా వెరిఫై అవ్వలేదు
         return { success: true };
       }
 
@@ -215,9 +466,9 @@ export const useAuth = () => {
       socketService.disconnect();
       toast.success("Logged out successfully");
       setLoading(false);
-      if (typeof window !== "undefined") {
-        window.location.href = "/login";
-      }
+
+      // 🔥 UPDATE: Next.js router for smooth navigation instead of hard reload
+      router.push("/login");
     }
   };
 

@@ -160,7 +160,10 @@ export default function GarageSection() {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Model Select */}
                     <div className="space-y-2.5">
-                      <label className="text-xs font-bold uppercase text-gray-500 dark:text-gray-400 tracking-wider flex items-center gap-2">
+                      <label
+                        htmlFor="model-select" // 🔥 FIX: Associated label with select
+                        className="text-xs font-bold uppercase text-gray-500 dark:text-gray-400 tracking-wider flex items-center gap-2"
+                      >
                         <Car
                           size={14}
                           className="text-blue-600 dark:text-cyan-500"
@@ -169,6 +172,8 @@ export default function GarageSection() {
                       </label>
                       <div className="relative group">
                         <select
+                          id="model-select"
+                          aria-label="Select Hyundai Model" // 🔥 ACCESSIBILITY FIX
                           value={formData.model}
                           onChange={(e) =>
                             setFormData({
@@ -209,13 +214,18 @@ export default function GarageSection() {
                         />{" "}
                         Fuel Type
                       </label>
-                      <div className="grid grid-cols-4 gap-2 bg-gray-100 dark:bg-[#1a1d26] p-1.5 rounded-xl border border-gray-200 dark:border-white/10">
+                      <div
+                        className="grid grid-cols-4 gap-2 bg-gray-100 dark:bg-[#1a1d26] p-1.5 rounded-xl border border-gray-200 dark:border-white/10"
+                        role="group" // 🔥 ACCESSIBILITY FIX: grouping buttons
+                        aria-label="Select Fuel Type"
+                      >
                         {FUEL_TYPES.map((fuel) => (
                           <button
                             key={fuel}
                             onClick={() =>
                               setFormData({ ...formData, fuelType: fuel })
                             }
+                            aria-pressed={formData.fuelType === fuel} // 🔥 ACCESSIBILITY FIX
                             className={`relative rounded-lg py-2.5 text-[11px] font-bold transition-all flex flex-col items-center justify-center gap-1 ${
                               formData.fuelType === fuel
                                 ? "bg-white dark:bg-gradient-to-br dark:from-cyan-600 dark:to-blue-600 text-blue-700 dark:text-white shadow-sm dark:shadow-lg ring-1 ring-gray-200 dark:ring-0"
@@ -233,7 +243,10 @@ export default function GarageSection() {
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
                     {/* Year */}
                     <div className="lg:col-span-3 space-y-2.5">
-                      <label className="text-xs font-bold uppercase text-gray-500 dark:text-gray-400 tracking-wider flex items-center gap-2">
+                      <label
+                        htmlFor="year-select"
+                        className="text-xs font-bold uppercase text-gray-500 dark:text-gray-400 tracking-wider flex items-center gap-2"
+                      >
                         <Calendar
                           size={14}
                           className="text-blue-600 dark:text-cyan-500"
@@ -242,6 +255,8 @@ export default function GarageSection() {
                       </label>
                       <div className="relative">
                         <select
+                          id="year-select"
+                          aria-label="Select Manufacturing Year" // 🔥 ACCESSIBILITY FIX
                           value={formData.year}
                           onChange={(e) =>
                             setFormData((prev) => ({
@@ -272,7 +287,10 @@ export default function GarageSection() {
 
                     {/* Variant */}
                     <div className="lg:col-span-5 space-y-2.5">
-                      <label className="text-xs font-bold uppercase text-gray-500 dark:text-gray-400 tracking-wider flex items-center gap-2">
+                      <label
+                        htmlFor="variant-select"
+                        className="text-xs font-bold uppercase text-gray-500 dark:text-gray-400 tracking-wider flex items-center gap-2"
+                      >
                         <Wrench
                           size={14}
                           className="text-blue-600 dark:text-cyan-500"
@@ -281,6 +299,8 @@ export default function GarageSection() {
                       </label>
                       <div className="relative">
                         <select
+                          id="variant-select"
+                          aria-label="Select Car Variant" // 🔥 ACCESSIBILITY FIX
                           value={formData.variant}
                           onChange={(e) =>
                             setFormData((prev) => ({
@@ -312,6 +332,7 @@ export default function GarageSection() {
                     {/* Action Button */}
                     <div className="lg:col-span-4">
                       <motion.button
+                        aria-label="Search for compatible parts" // 🔥 ACCESSIBILITY FIX
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={handleShowParts}
@@ -349,6 +370,7 @@ export default function GarageSection() {
               {/* Marquee Content with Bright, Different Colors */}
               <div className="py-3.5 flex animate-marquee whitespace-nowrap items-centermask-image-gradient pl-28">
                 {[
+                  ...COMPATIBLE_MODELS,
                   ...COMPATIBLE_MODELS,
                   ...COMPATIBLE_MODELS,
                   ...COMPATIBLE_MODELS,

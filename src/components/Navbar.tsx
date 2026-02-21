@@ -6,7 +6,7 @@
 // import { useStore } from "@/store/useStore";
 // import { useAuth } from "@/hooks/useAuth";
 // import { usePathname } from "next/navigation";
-// import { GarageModal } from "./GarageModal"; // ✅ Import Modal here
+// import { GarageModal } from "./GarageModal";
 // import {
 //   ShoppingCart,
 //   Menu,
@@ -24,7 +24,8 @@
 // } from "lucide-react";
 
 // export const Navbar = () => {
-//   const [scrolled, setScrolled] = useState(false);
+//   // 🔥 UPDATED: scrolled బదులు showNavbar వాడుతున్నాం
+//   const [showNavbar, setShowNavbar] = useState(false);
 //   const {
 //     theme,
 //     toggleTheme,
@@ -32,19 +33,27 @@
 //     toggleCartDrawer,
 //     isMobileMenuOpen,
 //     toggleMobileMenu,
-//     selectedVehicle, // ✅ Store నుండి కారు డేటా తీసుకుంటున్నాం
+//     selectedVehicle,
 //   } = useStore();
 
 //   const { user, isAuthenticated, logout } = useAuth();
-
-//   // Modal State only (Logic is moved to Store & Component)
 //   const [isGarageModalOpen, setIsGarageModalOpen] = useState(false);
 
-//   // Scroll Effect
+//   // 🔥 UPDATED: Scroll Effect (Hide on Top, Show on Scroll)
 //   useEffect(() => {
 //     const handleScroll = () => {
-//       setScrolled(window.scrollY > 20);
+//       // 200 పిక్సెల్స్ కిందకు స్క్రోల్ చేస్తే నావ్ బార్ కనిపిస్తుంది.
+//       // (లేదా హోమ్ పేజీ కాకుండా వేరే పేజీలో ఉంటే ఎప్పుడూ కనబడేలా కూడా పెట్టుకోవచ్చు)
+//       if (window.scrollY > 200) {
+//         setShowNavbar(true);
+//       } else {
+//         setShowNavbar(false);
+//       }
 //     };
+
+//     // Page load అయిన వెంటనే ఒకసారి చెక్ చేయడానికి
+//     handleScroll();
+
 //     window.addEventListener("scroll", handleScroll);
 //     return () => {
 //       window.removeEventListener("scroll", handleScroll);
@@ -52,6 +61,12 @@
 //   }, []);
 
 //   const pathname = usePathname();
+
+//   // ఒకవేళ హోమ్ పేజీలో కాకుండా వేరే పేజీలలో ఎప్పుడూ Navbar కనబడాలి అనుకుంటే ఇది వాడండి
+//   const isHomePage = pathname === "/";
+//   // హోమ్ పేజీలో ఉంటే స్క్రోల్ బట్టి, వేరే పేజీలలో ఉంటే ఎప్పుడూ (లేదా మొబైల్ మెనూ ఓపెన్ ఉంటే) కనబడుతుంది.
+//   const isVisible = (isHomePage ? showNavbar : true) || isMobileMenuOpen;
+
 //   if (
 //     pathname === "/login" ||
 //     pathname === "/register" ||
@@ -70,14 +85,11 @@
 //   return (
 //     <>
 //       <motion.nav
+//         // 🔥 UPDATED: Navbar హైడ్/షో యానిమేషన్ లాజిక్
 //         initial={{ y: -100 }}
-//         animate={{ y: 0 }}
-//         transition={{ duration: 0.5, ease: "easeOut" }}
-//         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-//           scrolled || isMobileMenuOpen
-//             ? "h-16 bg-white/90 dark:bg-[#050B14]/90 backdrop-blur-xl shadow-sm"
-//             : "h-20 bg-transparent"
-//         }`}
+//         animate={{ y: isVisible ? 0 : -100 }}
+//         transition={{ duration: 0.3, ease: "easeInOut" }}
+//         className={`fixed top-0 left-0 right-0 z-50 h-16 bg-white/90 dark:bg-[#050B14]/90 backdrop-blur-xl shadow-sm`}
 //       >
 //         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
 //           <div className="flex items-center justify-between h-full">
@@ -144,7 +156,6 @@
 //                           : ""
 //                       }
 //                     />
-//                     {/* కారు సెలెక్ట్ చేస్తే గ్రీన్ డాట్ బదులు టెక్స్ట్ చూపిస్తున్నాం */}
 //                     {selectedVehicle && (
 //                       <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400 hidden lg:block">
 //                         {selectedVehicle.model}
@@ -455,7 +466,7 @@
 //         )}
 //       </AnimatePresence>
 
-//       {/* ✅ NEW: Garage Modal Component (Clean Integration) */}
+//       {/* ✅ NEW: Garage Modal Component */}
 //       <GarageModal
 //         isOpen={isGarageModalOpen}
 //         onClose={() => setIsGarageModalOpen(false)}
@@ -564,7 +575,6 @@ import {
 } from "lucide-react";
 
 export const Navbar = () => {
-  // 🔥 UPDATED: scrolled బదులు showNavbar వాడుతున్నాం
   const [showNavbar, setShowNavbar] = useState(false);
   const {
     theme,
@@ -579,11 +589,8 @@ export const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const [isGarageModalOpen, setIsGarageModalOpen] = useState(false);
 
-  // 🔥 UPDATED: Scroll Effect (Hide on Top, Show on Scroll)
   useEffect(() => {
     const handleScroll = () => {
-      // 200 పిక్సెల్స్ కిందకు స్క్రోల్ చేస్తే నావ్ బార్ కనిపిస్తుంది.
-      // (లేదా హోమ్ పేజీ కాకుండా వేరే పేజీలో ఉంటే ఎప్పుడూ కనబడేలా కూడా పెట్టుకోవచ్చు)
       if (window.scrollY > 200) {
         setShowNavbar(true);
       } else {
@@ -591,7 +598,6 @@ export const Navbar = () => {
       }
     };
 
-    // Page load అయిన వెంటనే ఒకసారి చెక్ చేయడానికి
     handleScroll();
 
     window.addEventListener("scroll", handleScroll);
@@ -602,9 +608,7 @@ export const Navbar = () => {
 
   const pathname = usePathname();
 
-  // ఒకవేళ హోమ్ పేజీలో కాకుండా వేరే పేజీలలో ఎప్పుడూ Navbar కనబడాలి అనుకుంటే ఇది వాడండి
   const isHomePage = pathname === "/";
-  // హోమ్ పేజీలో ఉంటే స్క్రోల్ బట్టి, వేరే పేజీలలో ఉంటే ఎప్పుడూ (లేదా మొబైల్ మెనూ ఓపెన్ ఉంటే) కనబడుతుంది.
   const isVisible = (isHomePage ? showNavbar : true) || isMobileMenuOpen;
 
   if (
@@ -625,7 +629,6 @@ export const Navbar = () => {
   return (
     <>
       <motion.nav
-        // 🔥 UPDATED: Navbar హైడ్/షో యానిమేషన్ లాజిక్
         initial={{ y: -100 }}
         animate={{ y: isVisible ? 0 : -100 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -666,8 +669,9 @@ export const Navbar = () => {
 
             {/* Right actions */}
             <div className="flex items-center gap-2 sm:gap-3">
-              {/* Theme Toggle */}
+              {/* Theme Toggle - 🔥 ACCESSIBILITY FIX: aria-label added */}
               <motion.button
+                aria-label="Toggle theme"
                 whileTap={{ scale: 0.9 }}
                 onClick={toggleTheme}
                 className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors hidden sm:flex"
@@ -681,8 +685,9 @@ export const Navbar = () => {
 
               {!isAdmin && (
                 <>
-                  {/* My Garage Button (Desktop) */}
+                  {/* My Garage Button (Desktop) - 🔥 ACCESSIBILITY FIX: aria-label added */}
                   <motion.button
+                    aria-label="Open My Garage"
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setIsGarageModalOpen(true)}
                     className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors relative hidden sm:flex items-center gap-2"
@@ -706,9 +711,10 @@ export const Navbar = () => {
                     )}
                   </motion.button>
 
-                  {/* Wishlist */}
+                  {/* Wishlist - 🔥 ACCESSIBILITY FIX: aria-label added */}
                   <Link href="/wishlist">
                     <motion.button
+                      aria-label="Wishlist"
                       whileTap={{ scale: 0.9 }}
                       className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors"
                     >
@@ -716,8 +722,9 @@ export const Navbar = () => {
                     </motion.button>
                   </Link>
 
-                  {/* Cart */}
+                  {/* Cart - 🔥 ACCESSIBILITY FIX: aria-label added */}
                   <motion.button
+                    aria-label="Shopping Cart"
                     whileTap={{ scale: 0.9 }}
                     onClick={toggleCartDrawer}
                     className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors"
@@ -739,7 +746,13 @@ export const Navbar = () => {
               {/* User Menu */}
               {isAuthenticated ? (
                 <div className="relative group hidden md:block ml-2">
-                  <div className="cursor-pointer py-2">
+                  {/* 🔥 ACCESSIBILITY FIX: added aria-label and type="button" to the div behaving as a button */}
+                  <div
+                    role="button"
+                    aria-label="User menu"
+                    tabIndex={0}
+                    className="cursor-pointer py-2 outline-none focus:ring-2 focus:ring-blue-500 rounded-full"
+                  >
                     <motion.div
                       whileHover={{ scale: 1.05 }}
                       className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 p-[2px]"
@@ -799,8 +812,10 @@ export const Navbar = () => {
                 </Link>
               )}
 
-              {/* Mobile Menu Button */}
+              {/* Mobile Menu Button - 🔥 ACCESSIBILITY FIX: aria-label and aria-expanded added */}
               <motion.button
+                aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+                aria-expanded={isMobileMenuOpen}
                 whileTap={{ scale: 0.9 }}
                 onClick={toggleMobileMenu}
                 className="md:hidden p-2 ml-1 rounded-full bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white"
@@ -836,6 +851,7 @@ export const Navbar = () => {
                   Menu
                 </span>
                 <button
+                  aria-label="Close menu" // 🔥 ACCESSIBILITY FIX
                   onClick={toggleMobileMenu}
                   className="p-2 rounded-full bg-gray-100 dark:bg-white/10 hover:bg-red-100 dark:hover:bg-red-500/20 text-gray-600 dark:text-gray-300 hover:text-red-500 transition-colors"
                 >
@@ -1006,7 +1022,6 @@ export const Navbar = () => {
         )}
       </AnimatePresence>
 
-      {/* ✅ NEW: Garage Modal Component */}
       <GarageModal
         isOpen={isGarageModalOpen}
         onClose={() => setIsGarageModalOpen(false)}
@@ -1015,7 +1030,7 @@ export const Navbar = () => {
   );
 };
 
-// 🛠️ Helper Components (No Changes Needed Here)
+// 🛠️ Helper Components
 
 function NavLink({
   href,

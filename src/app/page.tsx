@@ -8,7 +8,6 @@
 //   useTransform,
 // } from "framer-motion";
 // import dynamic from "next/dynamic";
-// import { ProductCard } from "@/components/ProductCard";
 // import { useStore } from "@/store/useStore";
 // import apiClient from "@/services/apiClient";
 // import toast from "react-hot-toast";
@@ -28,15 +27,17 @@
 // import Link from "next/link";
 // import { useRouter } from "next/navigation";
 // import { wishlistAPI } from "@/lib/api/wishlist";
+// import { TrustBadges } from "@/components/TrustBadges";
+// import Image from "next/image";
 
-// // 🔥 DYNAMIC IMPORTS
+// // 🔥 DYNAMIC IMPORTS (Optimized for Performance)
 // const VisualPartsFinder = dynamic(
 //   () => import("@/components/VisualPartsFinder"),
 //   {
 //     loading: () => (
 //       <div className="h-96 w-full bg-gray-100 dark:bg-white/5 rounded-[2rem] animate-pulse my-12" />
 //     ),
-//     ssr: false,
+//     ssr: false, // క్లయింట్ లో మాత్రమే లోడ్ అవుతుంది, సర్వర్ లోడింగ్ బరువు తగ్గుతుంది
 //   },
 // );
 
@@ -44,6 +45,7 @@
 //   loading: () => (
 //     <div className="h-64 w-full bg-gray-100 dark:bg-white/5 rounded-2xl animate-pulse my-8" />
 //   ),
+//   ssr: false, // పేజీ అడుగున ఉంటుంది కాబట్టి లేజీ లోడ్ చేయడమే మంచిది
 // });
 
 // const GarageSection = dynamic(() => import("@/components/GarageSection"), {
@@ -65,7 +67,15 @@
 //   import("@/components/whyChooseUs").then((mod) => mod.WhyChooseUs),
 // );
 
-// // --- INTERFACES & CONSTANTS (Same as before) ---
+// // ప్రొడక్ట్ కార్డ్ ని కూడా లేజీ లోడ్ చేస్తున్నాం జావాస్క్రిప్ట్ బండిల్ సైజు తగ్గించడానికి
+// const ProductCard = dynamic(
+//   () => import("@/components/ProductCard").then((mod) => mod.ProductCard),
+//   {
+//     loading: () => <ProductSkeleton />,
+//   },
+// );
+
+// // --- INTERFACES & CONSTANTS ---
 // interface FlashSale {
 //   isActive: boolean;
 //   salePrice: number;
@@ -271,61 +281,83 @@
 //     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-pink-50 dark:from-[#0f0014] dark:via-[#1a0b2e] dark:to-[#05000a] text-slate-900 dark:text-white font-sans transition-colors duration-500 overflow-x-hidden">
 //       {/* 🌌 GLOBAL BACKGROUND AMBIENCE (Updated Colors) */}
 //       <div className="fixed inset-0 pointer-events-none z-0">
-//         {/* Light: Soft Blue/Pink | Dark: Hot Pink/Deep Purple */}
 //         <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-indigo-300/20 dark:bg-purple-600/10 rounded-full blur-[120px]" />
 //         <div className="absolute bottom-[20%] right-[-5%] w-[500px] h-[500px] bg-pink-300/20 dark:bg-pink-600/10 rounded-full blur-[100px]" />
 //       </div>
 
 //       <main className="relative z-10">
-//         {/* ================= HERO SECTION (Updated Layout & Clarity) ================= */}
+//         {/* ================= HERO SECTION ================= */}
 //         <section
 //           ref={heroRef}
 //           className="relative w-full h-[100dvh] overflow-hidden bg-black"
 //         >
 //           {/* ==============================
-//           VIDEO LAYER (Crystal Clear & Responsive)
+//           VIDEO LAYER (High Performance Optimized)
 //           ============================== */}
 //           <div className="absolute inset-0 z-0">
-//             {/* Desktop Video (Hidden on mobile) */}
+//             {/* 🔥 PERF UPDATE: Optimized Background Poster for Desktop */}
+//             <div className="hidden md:block absolute inset-0 z-0">
+//               <Image
+//                 src="/images/hyundai-hero.png" // మీ డెస్క్‌టాప్ ఇమేజ్
+//                 alt="Hyundai Parts Desktop Background"
+//                 fill
+//                 priority // ఫస్ట్ లోడ్ కి చాలా ముఖ్యం
+//                 className="object-cover object-center opacity-70"
+//                 sizes="100vw"
+//                 quality={80} // ఆప్టిమల్ క్వాలిటీ & స్పీడ్ కోసం
+//               />
+//             </div>
+
+//             {/* 🔥 PERF UPDATE: Optimized Background Poster for Mobile */}
+//             <div className="block md:hidden absolute inset-0 z-0">
+//               <Image
+//                 src="/images/mobileHero.png" // మీ మొబైల్ ఇమేజ్
+//                 alt="Hyundai Parts Mobile Background"
+//                 fill
+//                 priority // ఫస్ట్ లోడ్ కి చాలా ముఖ్యం
+//                 className="object-cover object-center opacity-70"
+//                 sizes="100vw"
+//                 quality={80} // ఆప్టిమల్ క్వాలిటీ & స్పీడ్ కోసం
+//               />
+//             </div>
+
+//             {/* Desktop Video (Video tag no longer needs the heavy 'poster' attribute) */}
 //             <video
 //               autoPlay
 //               loop
 //               muted
 //               playsInline
-//               className="hidden md:block w-full h-full object-cover object-center scale-105"
+//               preload="auto"
+//               className="hidden md:block w-full h-full object-cover object-center scale-105 relative z-10"
 //             >
-//               <source src="/videos/videodesktop.mp4" type="video/mp4" />
+//               <source src="/videos/Desktopvideo.mp4" type="video/mp4" />
 //             </video>
 
-//             {/* Mobile Video (Hidden on desktop) */}
+//             {/* Mobile Video */}
 //             <video
 //               autoPlay
 //               loop
 //               muted
 //               playsInline
-//               className="block md:hidden w-full h-full object-cover object-center scale-105"
+//               preload="auto"
+//               className="block md:hidden w-full h-full object-cover object-center scale-105 relative z-10"
 //             >
-//               <source src="/videos/mobilevideo.mp4" type="video/mp4" />
+//               <source src="/videos/Mobilevideo-small.mp4" type="video/mp4" />
 //             </video>
 
-//             {/* VERY MINIMAL OVERLAY:
-//                 Only at the bottom to make text readable.
-//                 Added a super thin 10% black overlay globally just to remove any harsh bright spots
-//                 without losing video quality.
-//             */}
-//             <div className="absolute inset-0 bg-black/10 z-0 pointer-events-none" />
-//             <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10 pointer-events-none" />
+//             {/* Overlays for Text Readability */}
+//             <div className="absolute inset-0 bg-black/10 z-20 pointer-events-none" />
+//             <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-20 pointer-events-none" />
 //           </div>
 
 //           {/* ==============================
-//           TEXT CONTENT (Minimal & Small)
+//           TEXT CONTENT
 //           ============================== */}
 //           <motion.div
 //             style={{ opacity: opacityText }}
-//             className="relative z-20 h-full flex flex-col justify-end items-start px-6 pb-12 md:px-16 md:pb-16"
+//             className="relative z-30 h-full flex flex-col justify-end items-start px-6 pb-12 md:px-16 md:pb-16"
 //           >
 //             <div className="max-w-2xl">
-//               {/* Badge - Small & Glassy */}
 //               <motion.div
 //                 initial={{ opacity: 0, y: 10 }}
 //                 animate={{ opacity: 1, y: 0 }}
@@ -338,7 +370,6 @@
 //                 </span>
 //               </motion.div>
 
-//               {/* Title - Significantly Smaller (Compact) */}
 //               <motion.h1
 //                 initial={{ opacity: 0, y: 10 }}
 //                 animate={{ opacity: 1, y: 0 }}
@@ -351,7 +382,6 @@
 //                 </span>
 //               </motion.h1>
 
-//               {/* Description - Single Line / Very Small */}
 //               <motion.p
 //                 initial={{ opacity: 0 }}
 //                 animate={{ opacity: 1 }}
@@ -364,13 +394,13 @@
 //           </motion.div>
 
 //           {/* ==============================
-//           SCROLL INDICATOR (Minimal)
+//           SCROLL INDICATOR
 //           ============================== */}
 //           <motion.div
 //             initial={{ opacity: 0 }}
 //             animate={{ opacity: 1 }}
 //             transition={{ delay: 1.5, duration: 1 }}
-//             className="absolute bottom-8 right-6 md:right-16 z-20"
+//             className="absolute bottom-8 right-6 md:right-16 z-30"
 //           >
 //             <button
 //               onClick={() =>
@@ -379,6 +409,7 @@
 //                   ?.scrollIntoView({ behavior: "smooth" })
 //               }
 //               className="group flex flex-col items-center justify-center gap-1"
+//               aria-label="Scroll to Garage Section"
 //             >
 //               <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/40 flex items-center justify-center bg-black/30 backdrop-blur-md group-hover:bg-white/20 transition-all duration-300 shadow-xl">
 //                 <ArrowDown
@@ -389,16 +420,14 @@
 //             </button>
 //           </motion.div>
 //         </section>
-//         {/* ================= DYNAMIC SECTIONS ================= */}
-//         <div className="w-full">
-//           <FestivalCarousel />
-//         </div>
+//         {/* ================= TRUST BADGE SECTION ================= */}
+//         <TrustBadges />
 
+//         {/* ================= GARAGE SECTION ================= */}
 //         <GarageSection />
 
 //         {/* ================= CATEGORIES ================= */}
 //         <section className="container mx-auto px-4 py-8 mb-5 md:mb-4">
-//           {/* Header Section */}
 //           <div className="flex items-center justify-between mb-6 md:mb-6">
 //             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
 //               Shop by Category
@@ -411,30 +440,23 @@
 //             </Link>
 //           </div>
 
-//           {/* Grid Section */}
 //           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
 //             {VISUAL_CATEGORIES.map((cat, i) => (
 //               <motion.div
 //                 key={i}
 //                 whileHover={{ y: -8, scale: 1.02 }}
-//                 whileTap={{ scale: 0.96 }} // 🔥 మొబైల్ లో టచ్ చేసినప్పుడు మంచి ఫీల్ కోసం
+//                 whileTap={{ scale: 0.96 }}
 //                 className="group relative p-[1px] rounded-2xl sm:rounded-[1.5rem] bg-gradient-to-b from-white/60 to-white/20 dark:from-white/10 dark:to-transparent shadow-md hover:shadow-xl cursor-pointer transition-all duration-300"
 //               >
-//                 {/* Card Content */}
 //                 <div className="h-full bg-white dark:bg-[#1a0b2e] rounded-2xl sm:rounded-[1.4rem] p-4 sm:p-5 md:p-6 flex flex-col items-center text-center gap-3 md:gap-4 relative overflow-hidden">
-//                   {/* Background Hover Effect */}
 //                   <div
 //                     className={`absolute inset-0 bg-gradient-to-br ${cat.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
 //                   />
-
-//                   {/* Icon */}
 //                   <div
 //                     className={`w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br ${cat.color} flex items-center justify-center text-white shadow-md group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0`}
 //                   >
 //                     {cat.icon}
 //                   </div>
-
-//                   {/* Text */}
 //                   <div className="relative z-10 flex flex-col items-center">
 //                     <h4 className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm md:text-base uppercase tracking-wide group-hover:text-indigo-600 dark:group-hover:text-pink-400 transition-colors line-clamp-1">
 //                       {cat.name}
@@ -449,8 +471,14 @@
 //           </div>
 //         </section>
 
+//         {/* ================= FESTIVAL CAROUSEL SECTIONS ================= */}
+//         <div className="w-full">
+//           <FestivalCarousel />
+//         </div>
+
 //         <VisualPartsFinder />
 
+//         {/* ================= SEARCH & PRODUCTS ================= */}
 //         {/* ================= SEARCH & PRODUCTS ================= */}
 //         <section
 //           id="search-section"
@@ -458,10 +486,19 @@
 //         >
 //           {/* --- Sticky Search Header --- */}
 //           <div className="sticky top-20 z-40 mb-12 max-w-5xl mx-auto">
-//             <div className="relative group">
-//               {/* Glow Effect */}
-//               <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-pink-600 rounded-[2rem] opacity-20 group-hover:opacity-40 blur-xl transition duration-500"></div>
+//             {/* 🔥 NEW: Professional Header Text */}
+//             <div className="text-center mb-6">
+//               <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
+//                 Find the Perfect Part
+//               </h2>
+//               <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 font-medium max-w-2xl mx-auto">
+//                 Search by keyword, part number, or use your 17-digit VIN to
+//                 ensure 100% compatibility.
+//               </p>
+//             </div>
 
+//             <div className="relative group">
+//               <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-pink-600 rounded-[2rem] opacity-20 group-hover:opacity-40 blur-xl transition duration-500"></div>
 //               <div className="relative bg-white/80 dark:bg-[#1a0b2e]/90 backdrop-blur-2xl border border-white/60 dark:border-white/10 p-2 md:p-2.5 rounded-[1.8rem] shadow-2xl shadow-indigo-900/5 dark:shadow-black/50 flex flex-col md:flex-row gap-2 transition-all">
 //                 {/* --- Filter Tabs --- */}
 //                 <div className="flex p-1 bg-gray-100/80 dark:bg-white/5 rounded-2xl w-full md:w-auto shrink-0 overflow-x-auto no-scrollbar">
@@ -485,12 +522,14 @@
 //                 </div>
 
 //                 {/* --- Search Input Area --- */}
-//                 <div className="relative flex-1 group/input bg-gray-50 dark:bg-black/20 md:bg-transparent md:dark:bg-transparent rounded-2xl md:rounded-none transition-colors">
+//                 <div className="relative flex-1 group/input bg-gray-50 dark:bg-black/20 md:bg-transparent md:dark:bg-transparent rounded-2xl md:rounded-none transition-colors flex items-center">
+//                   {/* 🔥 UPDATED: Search Icon Alignment */}
 //                   <button
 //                     onClick={handleSearch}
-//                     className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within/input:text-indigo-600 dark:group-focus-within/input:text-pink-400 hover:scale-110 transition-all duration-300 z-10"
+//                     aria-label="Search"
+//                     className="absolute left-5 text-gray-400 group-focus-within/input:text-indigo-600 dark:group-focus-within/input:text-pink-400 hover:scale-110 transition-all duration-300 z-10 flex items-center justify-center"
 //                   >
-//                     <Search size={22} strokeWidth={2.5} />
+//                     <Search size={20} strokeWidth={2.5} />
 //                   </button>
 
 //                   <input
@@ -510,19 +549,22 @@
 //                         : "Search for parts, categories..."
 //                     }
 //                     maxLength={searchType === "vin" ? 17 : 50}
-//                     className="w-full h-12 md:h-full bg-transparent border-2 border-transparent focus:border-indigo-100 dark:focus:border-pink-500/20 text-slate-900 dark:text-white pl-12 pr-10 outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 font-medium text-sm rounded-2xl md:rounded-xl focus:bg-white dark:focus:bg-white/5 transition-all duration-300"
+//                     // 🔥 UPDATED: Padding for Input to accommodate icons
+//                     className="w-full h-14 md:h-full bg-transparent border-2 border-transparent focus:border-indigo-100 dark:focus:border-pink-500/20 text-slate-900 dark:text-white pl-14 pr-12 outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 font-medium text-sm rounded-2xl md:rounded-xl focus:bg-white dark:focus:bg-white/5 transition-all duration-300"
 //                   />
 
 //                   <AnimatePresence>
 //                     {searchQuery && (
+//                       // 🔥 UPDATED: X Icon Alignment (Right-aligned perfectly)
 //                       <motion.button
 //                         initial={{ opacity: 0, scale: 0.8 }}
 //                         animate={{ opacity: 1, scale: 1 }}
 //                         exit={{ opacity: 0, scale: 0.8 }}
 //                         onClick={() => setSearchQuery("")}
-//                         className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-full transition-colors"
+//                         aria-label="Clear Search"
+//                         className="absolute right-4 p-1.5 text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-full transition-colors flex items-center justify-center z-10"
 //                       >
-//                         <X size={16} strokeWidth={3} />
+//                         <X size={18} strokeWidth={2.5} />
 //                       </motion.button>
 //                     )}
 //                   </AnimatePresence>
@@ -533,6 +575,7 @@
 
 //           {/* --- Results Grid --- */}
 //           <motion.div
+//             id="products-grid"
 //             layout
 //             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8"
 //           >
@@ -962,7 +1005,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-pink-50 dark:from-[#0f0014] dark:via-[#1a0b2e] dark:to-[#05000a] text-slate-900 dark:text-white font-sans transition-colors duration-500 overflow-x-hidden">
-      {/* 🌌 GLOBAL BACKGROUND AMBIENCE (Updated Colors) */}
+      {/* 🌌 GLOBAL BACKGROUND AMBIENCE */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-indigo-300/20 dark:bg-purple-600/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-[20%] right-[-5%] w-[500px] h-[500px] bg-pink-300/20 dark:bg-pink-600/10 rounded-full blur-[100px]" />
@@ -978,51 +1021,53 @@ export default function Home() {
           VIDEO LAYER (High Performance Optimized)
           ============================== */}
           <div className="absolute inset-0 z-0">
-            {/* 🔥 PERF UPDATE: Optimized Background Poster for Desktop */}
+            {/* Desktop Image Cover */}
             <div className="hidden md:block absolute inset-0 z-0">
               <Image
-                src="/images/hyundai-hero.png" // మీ డెస్క్‌టాప్ ఇమేజ్
+                src="/images/hyundai-hero.png"
                 alt="Hyundai Parts Desktop Background"
                 fill
-                priority // ఫస్ట్ లోడ్ కి చాలా ముఖ్యం
+                priority
                 className="object-cover object-center opacity-70"
                 sizes="100vw"
-                quality={80} // ఆప్టిమల్ క్వాలిటీ & స్పీడ్ కోసం
+                quality={80}
               />
             </div>
 
-            {/* 🔥 PERF UPDATE: Optimized Background Poster for Mobile */}
+            {/* Mobile Image Cover */}
             <div className="block md:hidden absolute inset-0 z-0">
               <Image
-                src="/images/mobileHero.png" // మీ మొబైల్ ఇమేజ్
+                src="/images/mobileHero.png"
                 alt="Hyundai Parts Mobile Background"
                 fill
-                priority // ఫస్ట్ లోడ్ కి చాలా ముఖ్యం
+                priority
                 className="object-cover object-center opacity-70"
                 sizes="100vw"
-                quality={80} // ఆప్టిమల్ క్వాలిటీ & స్పీడ్ కోసం
+                quality={80}
               />
             </div>
 
-            {/* Desktop Video (Video tag no longer needs the heavy 'poster' attribute) */}
+            {/* Desktop Video - FIXED PRELOAD AND ACCESSIBILITY */}
             <video
               autoPlay
               loop
               muted
               playsInline
-              preload="auto"
+              preload="none"
+              aria-hidden="true"
               className="hidden md:block w-full h-full object-cover object-center scale-105 relative z-10"
             >
               <source src="/videos/Desktopvideo.mp4" type="video/mp4" />
             </video>
 
-            {/* Mobile Video */}
+            {/* Mobile Video - FIXED PRELOAD AND ACCESSIBILITY */}
             <video
               autoPlay
               loop
               muted
               playsInline
-              preload="auto"
+              preload="none"
+              aria-hidden="true"
               className="block md:hidden w-full h-full object-cover object-center scale-105 relative z-10"
             >
               <source src="/videos/Mobilevideo-small.mp4" type="video/mp4" />
@@ -1103,6 +1148,7 @@ export default function Home() {
             </button>
           </motion.div>
         </section>
+
         {/* ================= TRUST BADGE SECTION ================= */}
         <TrustBadges />
 
@@ -1115,8 +1161,10 @@ export default function Home() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
               Shop by Category
             </h2>
+            {/* ADDED ARIA LABEL HERE */}
             <Link
               href="#"
+              aria-label="View all categories"
               className="text-indigo-600 dark:text-pink-400 text-xs sm:text-sm font-bold uppercase tracking-wider hover:underline flex items-center gap-1 transition-all"
             >
               View All <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -1162,14 +1210,12 @@ export default function Home() {
         <VisualPartsFinder />
 
         {/* ================= SEARCH & PRODUCTS ================= */}
-        {/* ================= SEARCH & PRODUCTS ================= */}
         <section
           id="search-section"
           className="container mx-auto px-4 py-8 md:py-16"
         >
           {/* --- Sticky Search Header --- */}
           <div className="sticky top-20 z-40 mb-12 max-w-5xl mx-auto">
-            {/* 🔥 NEW: Professional Header Text */}
             <div className="text-center mb-6">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
                 Find the Perfect Part
@@ -1206,7 +1252,6 @@ export default function Home() {
 
                 {/* --- Search Input Area --- */}
                 <div className="relative flex-1 group/input bg-gray-50 dark:bg-black/20 md:bg-transparent md:dark:bg-transparent rounded-2xl md:rounded-none transition-colors flex items-center">
-                  {/* 🔥 UPDATED: Search Icon Alignment */}
                   <button
                     onClick={handleSearch}
                     aria-label="Search"
@@ -1232,13 +1277,11 @@ export default function Home() {
                         : "Search for parts, categories..."
                     }
                     maxLength={searchType === "vin" ? 17 : 50}
-                    // 🔥 UPDATED: Padding for Input to accommodate icons
                     className="w-full h-14 md:h-full bg-transparent border-2 border-transparent focus:border-indigo-100 dark:focus:border-pink-500/20 text-slate-900 dark:text-white pl-14 pr-12 outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 font-medium text-sm rounded-2xl md:rounded-xl focus:bg-white dark:focus:bg-white/5 transition-all duration-300"
                   />
 
                   <AnimatePresence>
                     {searchQuery && (
-                      // 🔥 UPDATED: X Icon Alignment (Right-aligned perfectly)
                       <motion.button
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -1386,7 +1429,7 @@ const ProductSkeleton = forwardRef<HTMLDivElement>((props, ref) => {
 });
 ProductSkeleton.displayName = "ProductSkeleton";
 
-// ⚡ LOADER (Updated Colors)
+// ⚡ LOADER
 function FullScreenLoader() {
   return (
     <div className="fixed inset-0 z-[9999] bg-white dark:bg-[#05000a] flex flex-col items-center justify-center transition-colors">

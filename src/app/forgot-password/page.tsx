@@ -16,8 +16,9 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import Image from "next/image";
-// 🔥 1. Import API Client
+// 🔥 1. Import API Client & Store
 import apiClient from "@/services/apiClient";
+import { useStore } from "@/store/useStore";
 
 // --- Animations ---
 const containerVariants = {
@@ -33,6 +34,7 @@ const itemVariants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
+// 🔥 FIX: యానిమేషన్ కి GPU Acceleration కోసం సిద్ధం చేశాం
 const blobAnimation = {
   animate: {
     scale: [1, 1.1, 1],
@@ -48,8 +50,11 @@ export default function ForgotPasswordPage() {
     "idle" | "loading" | "success" | "error"
   >("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(true);
   const [mounted, setMounted] = useState(false);
+
+  // 🔥 FIX 1: Theme Sync - Global Store నుండి థీమ్ తీసుకుంటున్నాం
+  const { theme, toggleTheme } = useStore();
+  const isDarkMode = theme === "dark";
 
   // Hydration fix
   useEffect(() => {
@@ -63,7 +68,6 @@ export default function ForgotPasswordPage() {
 
     try {
       // 🔥 2. REAL API CALL
-      // Backend Endpoint: /auth/forgot-password
       const response = await apiClient.post("/auth/forgot-password", { email });
 
       if (response.data.success) {
@@ -71,7 +75,7 @@ export default function ForgotPasswordPage() {
       }
     } catch (error: any) {
       setStatus("error");
-      // Backend నుండి వచ్చిన ఎర్రర్ మెసేజ్ చూపించు (Ex: "User not found")
+      // Backend నుండి వచ్చిన ఎర్రర్ మెసేజ్ చూపించు
       const msg =
         error.response?.data?.message ||
         "Something went wrong. Please check your email.";
@@ -97,15 +101,16 @@ export default function ForgotPasswordPage() {
         />
         {isDarkMode && (
           <>
+            {/* 🔥 FIX 2: Performance కోసం transform-gpu మరియు will-change-transform యాడ్ చేశాం */}
             <motion.div
               animate={blobAnimation.animate}
               transition={blobAnimation.transition}
-              className="absolute top-[-20%] left-[-10%] w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[150px]"
+              className="absolute top-[-20%] left-[-10%] w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[100px] md:blur-[150px] transform-gpu will-change-transform"
             />
             <motion.div
               animate={blobAnimation.animate}
               transition={{ ...blobAnimation.transition, delay: 5 }}
-              className="absolute bottom-[-20%] right-[-10%] w-[700px] h-[700px] bg-indigo-600/10 rounded-full blur-[150px]"
+              className="absolute bottom-[-20%] right-[-10%] w-[700px] h-[700px] bg-indigo-600/10 rounded-full blur-[100px] md:blur-[150px] transform-gpu will-change-transform"
             />
           </>
         )}
@@ -114,6 +119,7 @@ export default function ForgotPasswordPage() {
       {/* ================= NAVBAR ================= */}
       <nav className="absolute top-0 left-0 w-full p-6 flex justify-between items-center z-50">
         <Link href="/" className="flex items-center gap-3 group">
+          {/* 🔥 🔴 మీ ఒరిజినల్ లోగో కావాలంటే ఇక్కడ మార్చుకోండి */}
           <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 group-hover:scale-105 transition-transform">
             <span className="font-bold text-xl">V</span>
           </div>
@@ -123,8 +129,9 @@ export default function ForgotPasswordPage() {
         </Link>
 
         <div className="flex items-center gap-3">
+          {/* 🔥 FIX 3: Local state తీసేసి, Global Theme toggle వాడుతున్నాం */}
           <button
-            onClick={() => setIsDarkMode(!isDarkMode)}
+            onClick={toggleTheme}
             className={`p-2.5 rounded-full transition-all border ${
               isDarkMode
                 ? "bg-white/5 border-white/10 text-yellow-400 hover:bg-white/10"
@@ -148,14 +155,15 @@ export default function ForgotPasswordPage() {
       </nav>
 
       {/* ================= MAIN CARD ================= */}
+      {/* 🔥 FIX 4: backdrop-blur-3xl తీసేసి backdrop-blur-xl పెట్టాం */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 30 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className={`w-full max-w-[1000px] min-h-[600px] grid grid-cols-1 lg:grid-cols-2 rounded-[2.5rem] overflow-hidden shadow-2xl relative z-10 border transition-all duration-500 ${
           isDarkMode
-            ? "bg-[#0a0a0a]/60 backdrop-blur-3xl border-white/10 shadow-black/60"
-            : "bg-white/80 backdrop-blur-2xl border-white/60 shadow-blue-200/40"
+            ? "bg-[#0a0a0a]/60 backdrop-blur-xl border-white/10 shadow-black/60"
+            : "bg-white/80 backdrop-blur-lg border-white/60 shadow-blue-200/40"
         }`}
       >
         {/* ================= LEFT SIDE (IMAGE) ================= */}
@@ -170,7 +178,7 @@ export default function ForgotPasswordPage() {
           />
 
           {/* Decorative Circle */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-blue-500/20 rounded-full blur-[80px] group-hover:bg-blue-500/30 transition-colors duration-700" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-blue-500/20 rounded-full blur-[80px] group-hover:bg-blue-500/30 transition-colors duration-700 transform-gpu" />
 
           {/* Content */}
           <div className="relative z-10">
@@ -225,7 +233,7 @@ export default function ForgotPasswordPage() {
 
         {/* ================= RIGHT SIDE (FORM) ================= */}
         <div
-          className={`flex flex-col justify-center p-8 lg:p-12 transition-colors duration-500 ${
+          className={`flex flex-col justify-center p-8 lg:p-12 transition-colors duration-500 transform-gpu ${
             isDarkMode ? "bg-transparent" : "bg-white/50"
           }`}
         >
@@ -264,7 +272,7 @@ export default function ForgotPasswordPage() {
                     <span className="text-blue-500 font-semibold">{email}</span>
                   </p>
                   <Link href="/login">
-                    <button className="w-full bg-white/10 hover:bg-white/15 border border-white/10 text-white font-bold py-3.5 rounded-xl transition-all">
+                    <button className="w-full bg-blue-600 hover:bg-blue-700 border border-blue-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-500/30">
                       Back to Login
                     </button>
                   </Link>
@@ -325,7 +333,7 @@ export default function ForgotPasswordPage() {
                         Registered Email
                       </label>
                       <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                           <Mail
                             className={`h-5 w-5 transition-colors ${
                               isDarkMode
@@ -340,10 +348,10 @@ export default function ForgotPasswordPage() {
                           onChange={(e) => setEmail(e.target.value)}
                           required
                           placeholder="name@example.com"
-                          className={`block w-full pl-11 pr-4 py-3.5 rounded-xl border-2 outline-none transition-all duration-300 font-medium ${
+                          className={`block w-full pl-12 pr-4 py-3.5 rounded-xl border-2 outline-none transition-all duration-300 font-medium backdrop-blur-sm ${
                             isDarkMode
                               ? "bg-white/5 border-white/5 text-white placeholder-gray-600 focus:bg-white/10 focus:border-blue-500/50"
-                              : "bg-gray-50 border-gray-100 text-gray-900 placeholder-gray-400 focus:bg-white focus:border-blue-500"
+                              : "bg-white border-gray-100 text-gray-900 placeholder-gray-400 focus:bg-white focus:border-blue-500 shadow-sm"
                           }`}
                         />
                       </div>
