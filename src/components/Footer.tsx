@@ -25,6 +25,7 @@
 //   Clock,
 // } from "lucide-react";
 // import SupportActionCards from "@/components/SupportActionCards";
+
 // export const Footer = () => {
 //   const currentYear = new Date().getFullYear();
 //   const pathname = usePathname();
@@ -109,7 +110,7 @@
 //     },
 //   ];
 
-//   // Hide footer on specific pages  verify-email
+//   // Hide footer on specific pages
 //   if (
 //     pathname === "/login" ||
 //     pathname === "/register" ||
@@ -268,6 +269,7 @@
 //                       <motion.a
 //                         key={social.name}
 //                         href={social.href}
+//                         aria-label={social.name} // 🔥 ACCESSIBILITY FIX
 //                         target="_blank"
 //                         rel="noopener noreferrer"
 //                         whileHover={{ y: -3 }}
@@ -285,12 +287,13 @@
 
 //           {/* 3. Bottom Bar */}
 //           <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-//             <p className="text-xs text-gray-500 dark:text-gray-500 font-medium text-center md:text-left">
+//             {/* 🔥 CONTRAST FIX: text-gray-500 to text-gray-600/400 */}
+//             <p className="text-xs text-gray-600 dark:text-gray-400 font-medium text-center md:text-left">
 //               © {currentYear} Varshini Hyundai Spares.{" "}
 //               <span className="hidden sm:inline">|</span> All rights reserved.
 //             </p>
 
-//             <div className="flex items-center gap-1 text-xs text-gray-400">
+//             <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
 //               <span>Made with</span>
 //               <Heart
 //                 size={10}
@@ -323,6 +326,8 @@
 //     <div className="border-b border-gray-200 dark:border-white/5 md:border-none last:border-none">
 //       <button
 //         onClick={() => setIsOpen(!isOpen)}
+//         aria-label={isOpen ? `Close ${title}` : `Open ${title}`} // 🔥 ACCESSIBILITY FIX
+//         aria-expanded={isOpen}
 //         className="flex items-center justify-between w-full py-4 md:py-0 md:mb-6 group"
 //       >
 //         <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest">
@@ -386,6 +391,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import {
@@ -405,7 +411,6 @@ import {
   Truck,
   ChevronDown,
   ArrowRight,
-  Sparkles,
   Clock,
 } from "lucide-react";
 import SupportActionCards from "@/components/SupportActionCards";
@@ -494,7 +499,6 @@ export const Footer = () => {
     },
   ];
 
-  // Hide footer on specific pages
   if (
     pathname === "/login" ||
     pathname === "/register" ||
@@ -520,7 +524,7 @@ export const Footer = () => {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
-          {/* 1. Features Grid (Floating Cards) */}
+          {/* 1. Features Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
             {features.map((feature, index) => (
               <motion.div
@@ -653,7 +657,7 @@ export const Footer = () => {
                       <motion.a
                         key={social.name}
                         href={social.href}
-                        aria-label={social.name} // 🔥 ACCESSIBILITY FIX
+                        aria-label={social.name}
                         target="_blank"
                         rel="noopener noreferrer"
                         whileHover={{ y: -3 }}
@@ -670,21 +674,48 @@ export const Footer = () => {
           </div>
 
           {/* 3. Bottom Bar */}
-          <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            {/* 🔥 CONTRAST FIX: text-gray-500 to text-gray-600/400 */}
-            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium text-center md:text-left">
-              © {currentYear} Varshini Hyundai Spares.{" "}
-              <span className="hidden sm:inline">|</span> All rights reserved.
-            </p>
-
-            <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-              <span>Made with</span>
-              <Heart
-                size={10}
-                className="text-red-500 fill-red-500 animate-pulse"
-              />
-              <span>for your car</span>
+          <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex flex-col items-center md:items-start gap-2">
+              <p className="text-xs text-gray-600 dark:text-gray-400 font-medium text-center md:text-left">
+                © {currentYear} Varshini Hyundai Spares.{" "}
+                <span className="hidden sm:inline">|</span> All rights reserved.
+              </p>
+              <div className="flex items-center gap-1 text-[11px] text-gray-500 dark:text-gray-500">
+                <span>Made with</span>
+                <Heart
+                  size={10}
+                  className="text-red-500 fill-red-500 animate-pulse mx-0.5"
+                />
+                <span>for your car</span>
+              </div>
             </div>
+
+            {/* 🔥 PERFECT S&A INNOVATIONS LOGO ALIGNMENT */}
+            <a
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 group"
+              title="Designed & Developed by S&A Innovations"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.25em] text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500 dark:from-blue-400 dark:to-cyan-300 drop-shadow-sm">
+                  Developed By
+                </span>
+              </div>
+
+              {/* Aspect ratio locks the box perfectly to the image shape, eliminating the weird gap. h-12 to h-16 gives it massive visibility */}
+              <div className="relative h-20 sm:h-24 aspect-[16/9] rounded-lg overflow-hidden bg-black/90 backdrop-blur-md border border-gray-300 dark:border-white/10 shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow-blue-500/25 group-hover:border-blue-400/40">
+                <Image
+                  src="/images/sa-logo.png"
+                  alt="S&A Innovations Logo"
+                  fill
+                  quality={100}
+                  unoptimized
+                  className="object-cover object-center scale-[1.05]" // Slight scale to crop out extra background edges
+                />
+              </div>
+            </a>
           </div>
         </div>
       </footer>
@@ -693,10 +724,9 @@ export const Footer = () => {
 };
 
 // ----------------------------------------------------------------------
-// 🛠️ Helper Components
+// 🛠️ Helper Components (No changes here)
 // ----------------------------------------------------------------------
 
-// 1. Mobile Responsive Accordion
 const FooterSection = ({
   title,
   children,
@@ -710,14 +740,13 @@ const FooterSection = ({
     <div className="border-b border-gray-200 dark:border-white/5 md:border-none last:border-none">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        aria-label={isOpen ? `Close ${title}` : `Open ${title}`} // 🔥 ACCESSIBILITY FIX
+        aria-label={isOpen ? `Close ${title}` : `Open ${title}`}
         aria-expanded={isOpen}
         className="flex items-center justify-between w-full py-4 md:py-0 md:mb-6 group"
       >
         <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest">
           {title}
         </h3>
-        {/* Chevron for mobile */}
         <div
           className={`md:hidden p-1 rounded-full transition-colors duration-300 ${isOpen ? "bg-blue-50 dark:bg-white/10 text-blue-600 dark:text-white" : "text-gray-400"}`}
         >
@@ -740,7 +769,6 @@ const FooterSection = ({
   );
 };
 
-// 2. Contact Item
 const ContactItem = ({
   icon: Icon,
   text,

@@ -1,7 +1,7 @@
 // src/components/ProductCard.tsx
 "use client";
 
-import React, { useState } from "react"; // 🔥 React.memo కోసం React ని ఇంపోర్ట్ చేశాను
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import toast from "react-hot-toast";
 
-// 1. 🛠️ Interfaces (Kept exactly as provided)
+// 1.  Interfaces (Kept exactly as provided)
 interface ProductImage {
   url: string;
   publicId: string;
@@ -58,15 +58,13 @@ interface ProductCardProps {
   initialWishlistState?: boolean;
 }
 
-// 🔥 PERF UPDATE 1: React.memo వాడటం వల్ల పేజీలో వేరేవి మారినప్పుడు ఈ కార్డ్స్ అనవసరంగా రీ-రెండర్ అవ్వవు
 export const ProductCard: React.FC<ProductCardProps> = React.memo(
   ({ product, onAddToCart, index = 0, initialWishlistState = false }) => {
-    // 🔥 PERF UPDATE 2: ఇక్కడ isHovered state తీసేశాను (మెయిన్ త్రెడ్ బ్లాకింగ్ నివారించడానికి)
     const [imageError, setImageError] = useState(false);
 
     const { user } = useAuth();
 
-    // 🛡️ Safe ID Check
+    //  Safe ID Check
     const productId = product._id || product.id;
 
     if (!productId) {
@@ -75,7 +73,7 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(
 
     const router = useRouter();
 
-    // 🔧 Image Logic (Kept exactly as is)
+    //  Image Logic (Kept exactly as is)
     const getImageUrl = () => {
       if (!product.images || product.images.length === 0) return null;
       const firstImage = product.images[0];
@@ -97,7 +95,7 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(
     const fallbackImage =
       "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=600&auto=format&fit=crop";
 
-    // ⚡ Price & Stock Logic
+    //  Price & Stock Logic
     const isFlashSaleActive =
       product.flashSale?.isActive &&
       product.flashSale.salePrice &&
@@ -143,7 +141,6 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(
           delay: index * 0.05,
           ease: "easeOut",
         }}
-        // 🔥 PERF UPDATE: onHover events తీసేశాను (CPU వాడకం తగ్గించడానికి)
         className="group relative h-full"
       >
         <Link
@@ -192,7 +189,6 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(
             )}
 
             <div className="relative aspect-square overflow-hidden bg-gray-50 dark:bg-[#020617]/50 border-b border-gray-100 dark:border-blue-500/10">
-              {/* 🔥 PERF UPDATE 3: motion.div తీసేసి, CSS class "group-hover:scale-[1.08]" వాడాను. ఇది అద్భుతంగా పనిచేస్తుంది మరియు స్పీడ్ పెంచుతుంది. */}
               <div className="w-full h-full relative transition-transform duration-700 ease-out group-hover:scale-[1.08]">
                 <Image
                   src={
@@ -203,7 +199,6 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(
                   className="object-cover"
                   onError={() => setImageError(true)}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  // 🔥 PERF UPDATE 4: unoptimized={true} ని తీసేశాను. దీనివల్ల Next.js ఆటోమేటిక్ గా ఇమేజెస్ కంప్రెస్ చేస్తుంది.
                 />
 
                 {/* Fallback Overlay */}
@@ -313,5 +308,4 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(
   },
 );
 
-// React.memo వాడినప్పుడు ఇది ఇవ్వడం మంచి పద్ధతి
 ProductCard.displayName = "ProductCard";

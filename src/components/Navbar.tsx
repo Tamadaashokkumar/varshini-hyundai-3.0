@@ -579,7 +579,6 @@ import {
 } from "lucide-react";
 
 export const Navbar = () => {
-  // 🔥 FIX 1: isScrolled అనే స్టేట్ వాడి బార్ ని హైడ్ చేయకుండా కేవలం డిజైన్ (షాడో) మారుస్తాం
   const [isScrolled, setIsScrolled] = useState(false);
   const {
     theme,
@@ -597,7 +596,6 @@ export const Navbar = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      // 20px స్క్రోల్ అవ్వగానే Navbar కి షాడో వస్తుంది
       if (window.scrollY > 20) {
         setIsScrolled(true);
       } else {
@@ -613,7 +611,6 @@ export const Navbar = () => {
     };
   }, []);
 
-  // ఎక్కడెక్కడ Navbar కనబడకూడదో ఆ లిస్ట్
   if (
     pathname === "/login" ||
     pathname === "/register" ||
@@ -634,7 +631,7 @@ export const Navbar = () => {
     <>
       <motion.nav
         initial={{ y: -100 }}
-        animate={{ y: 0 }} // 🔥 FIX 2: ఎప్పుడూ కనబడేలా 0 పెట్టాం
+        animate={{ y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
         className={`fixed top-0 left-0 right-0 z-[100] h-16 transition-all duration-300 ${
           isScrolled
@@ -1100,7 +1097,7 @@ export const Navbar = () => {
 function NavLink({
   href,
   children,
-  isLight = false, // 🔥 NEW: లింక్ కలర్ కంట్రోల్ చేయడానికి
+  isLight = false,
 }: {
   href: string;
   children: React.ReactNode;

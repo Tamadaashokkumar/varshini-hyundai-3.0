@@ -36,17 +36,15 @@ export default function AdminMessageModal() {
 
   // 3. Socket Connection & Listeners
   useEffect(() => {
-    // Initialize socket if not already done
     if (!socket) {
       socket = io(SOCKET_URL, {
         autoConnect: true,
         path: "/socket.io/",
         transports: ["websocket"],
-        withCredentials: true, // ✅ CRITICAL: Sends HttpOnly Cookies
+        withCredentials: true,
       });
     }
 
-    // ✅ 4. TypeScript Fix: Cast user to 'any' to access '_id' safely
     const currentUser = user as any;
     const userId = currentUser?._id || currentUser?.id;
 
@@ -80,7 +78,7 @@ export default function AdminMessageModal() {
   const sendReply = () => {
     if (!replyText.trim()) return;
 
-    // ✅ TypeScript Fix applied here as well
+    // TypeScript Fix applied here as well
     const currentUser = user as any;
     const userId = currentUser?._id || currentUser?.id;
     const userName = currentUser?.name || "Guest";
@@ -156,7 +154,7 @@ export default function AdminMessageModal() {
               ) : (
                 <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-bottom-2">
                   <textarea
-                    autoFocus // 🔥 UX Improvement: Automatically focuses
+                    autoFocus
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                     placeholder="Type your reply here..."
