@@ -24,7 +24,6 @@
 // } from "lucide-react";
 
 // export const Navbar = () => {
-//   // 🔥 UPDATED: scrolled బదులు showNavbar వాడుతున్నాం
 //   const [showNavbar, setShowNavbar] = useState(false);
 //   const {
 //     theme,
@@ -39,11 +38,8 @@
 //   const { user, isAuthenticated, logout } = useAuth();
 //   const [isGarageModalOpen, setIsGarageModalOpen] = useState(false);
 
-//   // 🔥 UPDATED: Scroll Effect (Hide on Top, Show on Scroll)
 //   useEffect(() => {
 //     const handleScroll = () => {
-//       // 200 పిక్సెల్స్ కిందకు స్క్రోల్ చేస్తే నావ్ బార్ కనిపిస్తుంది.
-//       // (లేదా హోమ్ పేజీ కాకుండా వేరే పేజీలో ఉంటే ఎప్పుడూ కనబడేలా కూడా పెట్టుకోవచ్చు)
 //       if (window.scrollY > 200) {
 //         setShowNavbar(true);
 //       } else {
@@ -51,7 +47,6 @@
 //       }
 //     };
 
-//     // Page load అయిన వెంటనే ఒకసారి చెక్ చేయడానికి
 //     handleScroll();
 
 //     window.addEventListener("scroll", handleScroll);
@@ -62,9 +57,7 @@
 
 //   const pathname = usePathname();
 
-//   // ఒకవేళ హోమ్ పేజీలో కాకుండా వేరే పేజీలలో ఎప్పుడూ Navbar కనబడాలి అనుకుంటే ఇది వాడండి
 //   const isHomePage = pathname === "/";
-//   // హోమ్ పేజీలో ఉంటే స్క్రోల్ బట్టి, వేరే పేజీలలో ఉంటే ఎప్పుడూ (లేదా మొబైల్ మెనూ ఓపెన్ ఉంటే) కనబడుతుంది.
 //   const isVisible = (isHomePage ? showNavbar : true) || isMobileMenuOpen;
 
 //   if (
@@ -85,7 +78,6 @@
 //   return (
 //     <>
 //       <motion.nav
-//         // 🔥 UPDATED: Navbar హైడ్/షో యానిమేషన్ లాజిక్
 //         initial={{ y: -100 }}
 //         animate={{ y: isVisible ? 0 : -100 }}
 //         transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -126,8 +118,9 @@
 
 //             {/* Right actions */}
 //             <div className="flex items-center gap-2 sm:gap-3">
-//               {/* Theme Toggle */}
+//               {/* Theme Toggle - 🔥 ACCESSIBILITY FIX: aria-label added */}
 //               <motion.button
+//                 aria-label="Toggle theme"
 //                 whileTap={{ scale: 0.9 }}
 //                 onClick={toggleTheme}
 //                 className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors hidden sm:flex"
@@ -141,8 +134,9 @@
 
 //               {!isAdmin && (
 //                 <>
-//                   {/* My Garage Button (Desktop) */}
+//                   {/* My Garage Button (Desktop) - 🔥 ACCESSIBILITY FIX: aria-label added */}
 //                   <motion.button
+//                     aria-label="Open My Garage"
 //                     whileTap={{ scale: 0.9 }}
 //                     onClick={() => setIsGarageModalOpen(true)}
 //                     className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors relative hidden sm:flex items-center gap-2"
@@ -166,9 +160,10 @@
 //                     )}
 //                   </motion.button>
 
-//                   {/* Wishlist */}
+//                   {/* Wishlist - 🔥 ACCESSIBILITY FIX: aria-label added */}
 //                   <Link href="/wishlist">
 //                     <motion.button
+//                       aria-label="Wishlist"
 //                       whileTap={{ scale: 0.9 }}
 //                       className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors"
 //                     >
@@ -176,8 +171,9 @@
 //                     </motion.button>
 //                   </Link>
 
-//                   {/* Cart */}
+//                   {/* Cart - 🔥 ACCESSIBILITY FIX: aria-label added */}
 //                   <motion.button
+//                     aria-label="Shopping Cart"
 //                     whileTap={{ scale: 0.9 }}
 //                     onClick={toggleCartDrawer}
 //                     className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors"
@@ -199,7 +195,13 @@
 //               {/* User Menu */}
 //               {isAuthenticated ? (
 //                 <div className="relative group hidden md:block ml-2">
-//                   <div className="cursor-pointer py-2">
+//                   {/* 🔥 ACCESSIBILITY FIX: added aria-label and type="button" to the div behaving as a button */}
+//                   <div
+//                     role="button"
+//                     aria-label="User menu"
+//                     tabIndex={0}
+//                     className="cursor-pointer py-2 outline-none focus:ring-2 focus:ring-blue-500 rounded-full"
+//                   >
 //                     <motion.div
 //                       whileHover={{ scale: 1.05 }}
 //                       className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 p-[2px]"
@@ -259,8 +261,10 @@
 //                 </Link>
 //               )}
 
-//               {/* Mobile Menu Button */}
+//               {/* Mobile Menu Button - 🔥 ACCESSIBILITY FIX: aria-label and aria-expanded added */}
 //               <motion.button
+//                 aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+//                 aria-expanded={isMobileMenuOpen}
 //                 whileTap={{ scale: 0.9 }}
 //                 onClick={toggleMobileMenu}
 //                 className="md:hidden p-2 ml-1 rounded-full bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white"
@@ -296,6 +300,7 @@
 //                   Menu
 //                 </span>
 //                 <button
+//                   aria-label="Close menu" // 🔥 ACCESSIBILITY FIX
 //                   onClick={toggleMobileMenu}
 //                   className="p-2 rounded-full bg-gray-100 dark:bg-white/10 hover:bg-red-100 dark:hover:bg-red-500/20 text-gray-600 dark:text-gray-300 hover:text-red-500 transition-colors"
 //                 >
@@ -466,7 +471,6 @@
 //         )}
 //       </AnimatePresence>
 
-//       {/* ✅ NEW: Garage Modal Component */}
 //       <GarageModal
 //         isOpen={isGarageModalOpen}
 //         onClose={() => setIsGarageModalOpen(false)}
@@ -475,7 +479,7 @@
 //   );
 // };
 
-// // 🛠️ Helper Components (No Changes Needed Here)
+// // 🛠️ Helper Components
 
 // function NavLink({
 //   href,
@@ -575,7 +579,8 @@ import {
 } from "lucide-react";
 
 export const Navbar = () => {
-  const [showNavbar, setShowNavbar] = useState(false);
+  // 🔥 FIX 1: isScrolled అనే స్టేట్ వాడి బార్ ని హైడ్ చేయకుండా కేవలం డిజైన్ (షాడో) మారుస్తాం
+  const [isScrolled, setIsScrolled] = useState(false);
   const {
     theme,
     toggleTheme,
@@ -588,13 +593,15 @@ export const Navbar = () => {
 
   const { user, isAuthenticated, logout } = useAuth();
   const [isGarageModalOpen, setIsGarageModalOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 200) {
-        setShowNavbar(true);
+      // 20px స్క్రోల్ అవ్వగానే Navbar కి షాడో వస్తుంది
+      if (window.scrollY > 20) {
+        setIsScrolled(true);
       } else {
-        setShowNavbar(false);
+        setIsScrolled(false);
       }
     };
 
@@ -606,11 +613,7 @@ export const Navbar = () => {
     };
   }, []);
 
-  const pathname = usePathname();
-
-  const isHomePage = pathname === "/";
-  const isVisible = (isHomePage ? showNavbar : true) || isMobileMenuOpen;
-
+  // ఎక్కడెక్కడ Navbar కనబడకూడదో ఆ లిస్ట్
   if (
     pathname === "/login" ||
     pathname === "/register" ||
@@ -625,14 +628,21 @@ export const Navbar = () => {
   }
 
   const isAdmin = user?.role === "admin";
+  const isHomePage = pathname === "/";
 
   return (
     <>
       <motion.nav
         initial={{ y: -100 }}
-        animate={{ y: isVisible ? 0 : -100 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
-        className={`fixed top-0 left-0 right-0 z-50 h-16 bg-white/90 dark:bg-[#050B14]/90 backdrop-blur-xl shadow-sm`}
+        animate={{ y: 0 }} // 🔥 FIX 2: ఎప్పుడూ కనబడేలా 0 పెట్టాం
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className={`fixed top-0 left-0 right-0 z-[100] h-16 transition-all duration-300 ${
+          isScrolled
+            ? "bg-white/90 dark:bg-[#050B14]/90 backdrop-blur-xl shadow-md border-b border-gray-200/50 dark:border-white/10"
+            : isHomePage
+              ? "bg-gradient-to-b from-black/80 to-transparent border-transparent" // హోమ్ పేజీలో టాప్ లో ఉంటే ట్రాన్స్‌పరెంట్
+              : "bg-white dark:bg-[#050B14] border-b border-gray-100 dark:border-white/5"
+        }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
           <div className="flex items-center justify-between h-full">
@@ -643,16 +653,26 @@ export const Navbar = () => {
             >
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="text-xl sm:text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500"
+                className={`text-xl sm:text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r ${
+                  !isScrolled && isHomePage
+                    ? "from-white to-gray-300" // వీడియో పైన వైట్ కలర్ లోగో
+                    : "from-blue-600 to-cyan-500"
+                }`}
               >
                 VARSHINI
               </motion.div>
-              <div className="h-4 w-[1px] bg-gray-300 dark:bg-gray-700 mx-1" />
+              <div
+                className={`h-4 w-[1px] mx-1 ${!isScrolled && isHomePage ? "bg-white/50" : "bg-gray-300 dark:bg-gray-700"}`}
+              />
               <div className="flex flex-col justify-center">
-                <span className="text-[10px] sm:text-xs font-bold text-gray-900 dark:text-white leading-none tracking-wide">
+                <span
+                  className={`text-[10px] sm:text-xs font-bold leading-none tracking-wide ${!isScrolled && isHomePage ? "text-white" : "text-gray-900 dark:text-white"}`}
+                >
                   HYUNDAI
                 </span>
-                <span className="text-[8px] uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
+                <span
+                  className={`text-[8px] uppercase tracking-[0.2em] ${!isScrolled && isHomePage ? "text-gray-300" : "text-gray-500 dark:text-gray-400"}`}
+                >
                   Spares
                 </span>
               </div>
@@ -660,24 +680,41 @@ export const Navbar = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-8">
-              <NavLink href="/products">Products</NavLink>
-              <NavLink href="/categories">Categories</NavLink>
+              <NavLink href="/products" isLight={!isScrolled && isHomePage}>
+                Products
+              </NavLink>
+              <NavLink href="/categories" isLight={!isScrolled && isHomePage}>
+                Categories
+              </NavLink>
               {isAuthenticated && !isAdmin && (
-                <NavLink href="/orders">Orders</NavLink>
+                <NavLink href="/orders" isLight={!isScrolled && isHomePage}>
+                  Orders
+                </NavLink>
               )}
             </div>
 
             {/* Right actions */}
             <div className="flex items-center gap-2 sm:gap-3">
-              {/* Theme Toggle - 🔥 ACCESSIBILITY FIX: aria-label added */}
+              {/* Theme Toggle */}
               <motion.button
                 aria-label="Toggle theme"
                 whileTap={{ scale: 0.9 }}
                 onClick={toggleTheme}
-                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors hidden sm:flex"
+                className={`p-2 rounded-full transition-colors hidden sm:flex ${
+                  !isScrolled && isHomePage
+                    ? "text-white hover:bg-white/20"
+                    : "hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300"
+                }`}
               >
                 {theme === "dark" ? (
-                  <Sun size={18} className="text-yellow-400" />
+                  <Sun
+                    size={18}
+                    className={
+                      !isScrolled && isHomePage
+                        ? "text-white"
+                        : "text-yellow-400"
+                    }
+                  />
                 ) : (
                   <Moon size={18} />
                 )}
@@ -685,24 +722,34 @@ export const Navbar = () => {
 
               {!isAdmin && (
                 <>
-                  {/* My Garage Button (Desktop) - 🔥 ACCESSIBILITY FIX: aria-label added */}
+                  {/* My Garage Button */}
                   <motion.button
                     aria-label="Open My Garage"
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setIsGarageModalOpen(true)}
-                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors relative hidden sm:flex items-center gap-2"
+                    className={`p-2 rounded-full transition-colors relative hidden sm:flex items-center gap-2 ${
+                      !isScrolled && isHomePage
+                        ? "text-white hover:bg-white/20"
+                        : "hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300"
+                    }`}
                     title="My Garage"
                   >
                     <Car
                       size={20}
                       className={
-                        selectedVehicle
+                        selectedVehicle && (isScrolled || !isHomePage)
                           ? "text-cyan-600 dark:text-cyan-400"
                           : ""
                       }
                     />
                     {selectedVehicle && (
-                      <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400 hidden lg:block">
+                      <span
+                        className={`text-xs font-bold hidden lg:block ${
+                          !isScrolled && isHomePage
+                            ? "text-white"
+                            : "text-cyan-600 dark:text-cyan-400"
+                        }`}
+                      >
                         {selectedVehicle.model}
                       </span>
                     )}
@@ -711,23 +758,31 @@ export const Navbar = () => {
                     )}
                   </motion.button>
 
-                  {/* Wishlist - 🔥 ACCESSIBILITY FIX: aria-label added */}
+                  {/* Wishlist */}
                   <Link href="/wishlist">
                     <motion.button
                       aria-label="Wishlist"
                       whileTap={{ scale: 0.9 }}
-                      className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors"
+                      className={`p-2 rounded-full transition-colors ${
+                        !isScrolled && isHomePage
+                          ? "text-white hover:bg-white/20"
+                          : "hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300"
+                      }`}
                     >
                       <Heart size={20} />
                     </motion.button>
                   </Link>
 
-                  {/* Cart - 🔥 ACCESSIBILITY FIX: aria-label added */}
+                  {/* Cart */}
                   <motion.button
                     aria-label="Shopping Cart"
                     whileTap={{ scale: 0.9 }}
                     onClick={toggleCartDrawer}
-                    className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors"
+                    className={`relative p-2 rounded-full transition-colors ${
+                      !isScrolled && isHomePage
+                        ? "text-white hover:bg-white/20"
+                        : "hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300"
+                    }`}
                   >
                     <ShoppingCart size={20} />
                     {cartItemCount > 0 && (
@@ -746,7 +801,6 @@ export const Navbar = () => {
               {/* User Menu */}
               {isAuthenticated ? (
                 <div className="relative group hidden md:block ml-2">
-                  {/* 🔥 ACCESSIBILITY FIX: added aria-label and type="button" to the div behaving as a button */}
                   <div
                     role="button"
                     aria-label="User menu"
@@ -755,7 +809,11 @@ export const Navbar = () => {
                   >
                     <motion.div
                       whileHover={{ scale: 1.05 }}
-                      className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 p-[2px]"
+                      className={`w-9 h-9 rounded-full p-[2px] ${
+                        !isScrolled && isHomePage
+                          ? "bg-white/50"
+                          : "bg-gradient-to-br from-blue-500 to-cyan-500"
+                      }`}
                     >
                       <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center">
                         <span className="font-bold text-sm text-blue-600 dark:text-cyan-400">
@@ -805,20 +863,28 @@ export const Navbar = () => {
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="px-5 py-2 bg-blue-600 text-white rounded-full text-sm font-semibold shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-colors"
+                    className={`px-5 py-2 rounded-full text-sm font-semibold shadow-lg transition-colors ${
+                      !isScrolled && isHomePage
+                        ? "bg-white text-black hover:bg-gray-200"
+                        : "bg-blue-600 text-white hover:bg-blue-700 shadow-blue-500/20"
+                    }`}
                   >
                     Login
                   </motion.button>
                 </Link>
               )}
 
-              {/* Mobile Menu Button - 🔥 ACCESSIBILITY FIX: aria-label and aria-expanded added */}
+              {/* Mobile Menu Button */}
               <motion.button
                 aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
                 aria-expanded={isMobileMenuOpen}
                 whileTap={{ scale: 0.9 }}
                 onClick={toggleMobileMenu}
-                className="md:hidden p-2 ml-1 rounded-full bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white"
+                className={`md:hidden p-2 ml-1 rounded-full ${
+                  !isScrolled && isHomePage
+                    ? "bg-white/20 text-white"
+                    : "bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white"
+                }`}
               >
                 {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
               </motion.button>
@@ -836,14 +902,14 @@ export const Navbar = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={toggleMobileMenu}
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden"
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[110] md:hidden"
             />
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="fixed right-0 top-0 bottom-0 w-[85%] max-w-[320px] bg-white dark:bg-[#0F172A] shadow-2xl z-50 md:hidden flex flex-col"
+              className="fixed right-0 top-0 bottom-0 w-[85%] max-w-[320px] bg-white dark:bg-[#0F172A] shadow-2xl z-[120] md:hidden flex flex-col"
             >
               {/* Drawer Header */}
               <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-white/5">
@@ -851,7 +917,7 @@ export const Navbar = () => {
                   Menu
                 </span>
                 <button
-                  aria-label="Close menu" // 🔥 ACCESSIBILITY FIX
+                  aria-label="Close menu"
                   onClick={toggleMobileMenu}
                   className="p-2 rounded-full bg-gray-100 dark:bg-white/10 hover:bg-red-100 dark:hover:bg-red-500/20 text-gray-600 dark:text-gray-300 hover:text-red-500 transition-colors"
                 >
@@ -904,7 +970,6 @@ export const Navbar = () => {
 
                   {!isAdmin && (
                     <>
-                      {/* Mobile Garage Button */}
                       <button
                         onClick={() => {
                           toggleMobileMenu();
@@ -1035,17 +1100,27 @@ export const Navbar = () => {
 function NavLink({
   href,
   children,
+  isLight = false, // 🔥 NEW: లింక్ కలర్ కంట్రోల్ చేయడానికి
 }: {
   href: string;
   children: React.ReactNode;
+  isLight?: boolean;
 }) {
   return (
     <Link
       href={href}
-      className="relative font-medium text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white transition-colors group"
+      className={`relative font-medium text-sm transition-colors group ${
+        isLight
+          ? "text-gray-200 hover:text-white"
+          : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white"
+      }`}
     >
       {children}
-      <span className="absolute -bottom-1 left-1/2 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full group-hover:left-0" />
+      <span
+        className={`absolute -bottom-1 left-1/2 w-0 h-0.5 transition-all duration-300 group-hover:w-full group-hover:left-0 ${
+          isLight ? "bg-white" : "bg-blue-600"
+        }`}
+      />
     </Link>
   );
 }

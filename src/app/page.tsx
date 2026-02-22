@@ -29,6 +29,7 @@
 // import { wishlistAPI } from "@/lib/api/wishlist";
 // import { TrustBadges } from "@/components/TrustBadges";
 // import Image from "next/image";
+// import PhoneBanner from "@/components/PhoneBanner";
 
 // // 🔥 DYNAMIC IMPORTS (Optimized for Performance)
 // const VisualPartsFinder = dynamic(
@@ -279,12 +280,12 @@
 
 //   return (
 //     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-pink-50 dark:from-[#0f0014] dark:via-[#1a0b2e] dark:to-[#05000a] text-slate-900 dark:text-white font-sans transition-colors duration-500 overflow-x-hidden">
-//       {/* 🌌 GLOBAL BACKGROUND AMBIENCE (Updated Colors) */}
+//       {/* 🌌 GLOBAL BACKGROUND AMBIENCE */}
 //       <div className="fixed inset-0 pointer-events-none z-0">
 //         <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-indigo-300/20 dark:bg-purple-600/10 rounded-full blur-[120px]" />
 //         <div className="absolute bottom-[20%] right-[-5%] w-[500px] h-[500px] bg-pink-300/20 dark:bg-pink-600/10 rounded-full blur-[100px]" />
 //       </div>
-
+//       <PhoneBanner />
 //       <main className="relative z-10">
 //         {/* ================= HERO SECTION ================= */}
 //         <section
@@ -295,51 +296,53 @@
 //           VIDEO LAYER (High Performance Optimized)
 //           ============================== */}
 //           <div className="absolute inset-0 z-0">
-//             {/* 🔥 PERF UPDATE: Optimized Background Poster for Desktop */}
+//             {/* Desktop Image Cover */}
 //             <div className="hidden md:block absolute inset-0 z-0">
 //               <Image
-//                 src="/images/hyundai-hero.png" // మీ డెస్క్‌టాప్ ఇమేజ్
+//                 src="/images/hyundai-hero.png"
 //                 alt="Hyundai Parts Desktop Background"
 //                 fill
-//                 priority // ఫస్ట్ లోడ్ కి చాలా ముఖ్యం
+//                 priority
 //                 className="object-cover object-center opacity-70"
 //                 sizes="100vw"
-//                 quality={80} // ఆప్టిమల్ క్వాలిటీ & స్పీడ్ కోసం
+//                 quality={80}
 //               />
 //             </div>
 
-//             {/* 🔥 PERF UPDATE: Optimized Background Poster for Mobile */}
+//             {/* Mobile Image Cover */}
 //             <div className="block md:hidden absolute inset-0 z-0">
 //               <Image
-//                 src="/images/mobileHero.png" // మీ మొబైల్ ఇమేజ్
+//                 src="/images/mobileHero.png"
 //                 alt="Hyundai Parts Mobile Background"
 //                 fill
-//                 priority // ఫస్ట్ లోడ్ కి చాలా ముఖ్యం
+//                 priority
 //                 className="object-cover object-center opacity-70"
 //                 sizes="100vw"
-//                 quality={80} // ఆప్టిమల్ క్వాలిటీ & స్పీడ్ కోసం
+//                 quality={80}
 //               />
 //             </div>
 
-//             {/* Desktop Video (Video tag no longer needs the heavy 'poster' attribute) */}
+//             {/* Desktop Video - FIXED PRELOAD AND ACCESSIBILITY */}
 //             <video
 //               autoPlay
 //               loop
 //               muted
 //               playsInline
-//               preload="auto"
+//               preload="none"
+//               aria-hidden="true"
 //               className="hidden md:block w-full h-full object-cover object-center scale-105 relative z-10"
 //             >
 //               <source src="/videos/Desktopvideo.mp4" type="video/mp4" />
 //             </video>
 
-//             {/* Mobile Video */}
+//             {/* Mobile Video - FIXED PRELOAD AND ACCESSIBILITY */}
 //             <video
 //               autoPlay
 //               loop
 //               muted
 //               playsInline
-//               preload="auto"
+//               preload="none"
+//               aria-hidden="true"
 //               className="block md:hidden w-full h-full object-cover object-center scale-105 relative z-10"
 //             >
 //               <source src="/videos/Mobilevideo-small.mp4" type="video/mp4" />
@@ -420,6 +423,7 @@
 //             </button>
 //           </motion.div>
 //         </section>
+
 //         {/* ================= TRUST BADGE SECTION ================= */}
 //         <TrustBadges />
 
@@ -432,8 +436,10 @@
 //             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
 //               Shop by Category
 //             </h2>
+//             {/* ADDED ARIA LABEL HERE */}
 //             <Link
 //               href="#"
+//               aria-label="View all categories"
 //               className="text-indigo-600 dark:text-pink-400 text-xs sm:text-sm font-bold uppercase tracking-wider hover:underline flex items-center gap-1 transition-all"
 //             >
 //               View All <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -479,14 +485,12 @@
 //         <VisualPartsFinder />
 
 //         {/* ================= SEARCH & PRODUCTS ================= */}
-//         {/* ================= SEARCH & PRODUCTS ================= */}
 //         <section
 //           id="search-section"
 //           className="container mx-auto px-4 py-8 md:py-16"
 //         >
 //           {/* --- Sticky Search Header --- */}
 //           <div className="sticky top-20 z-40 mb-12 max-w-5xl mx-auto">
-//             {/* 🔥 NEW: Professional Header Text */}
 //             <div className="text-center mb-6">
 //               <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
 //                 Find the Perfect Part
@@ -523,7 +527,6 @@
 
 //                 {/* --- Search Input Area --- */}
 //                 <div className="relative flex-1 group/input bg-gray-50 dark:bg-black/20 md:bg-transparent md:dark:bg-transparent rounded-2xl md:rounded-none transition-colors flex items-center">
-//                   {/* 🔥 UPDATED: Search Icon Alignment */}
 //                   <button
 //                     onClick={handleSearch}
 //                     aria-label="Search"
@@ -549,13 +552,11 @@
 //                         : "Search for parts, categories..."
 //                     }
 //                     maxLength={searchType === "vin" ? 17 : 50}
-//                     // 🔥 UPDATED: Padding for Input to accommodate icons
 //                     className="w-full h-14 md:h-full bg-transparent border-2 border-transparent focus:border-indigo-100 dark:focus:border-pink-500/20 text-slate-900 dark:text-white pl-14 pr-12 outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 font-medium text-sm rounded-2xl md:rounded-xl focus:bg-white dark:focus:bg-white/5 transition-all duration-300"
 //                   />
 
 //                   <AnimatePresence>
 //                     {searchQuery && (
-//                       // 🔥 UPDATED: X Icon Alignment (Right-aligned perfectly)
 //                       <motion.button
 //                         initial={{ opacity: 0, scale: 0.8 }}
 //                         animate={{ opacity: 1, scale: 1 }}
@@ -703,7 +704,7 @@
 // });
 // ProductSkeleton.displayName = "ProductSkeleton";
 
-// // ⚡ LOADER (Updated Colors)
+// // ⚡ LOADER
 // function FullScreenLoader() {
 //   return (
 //     <div className="fixed inset-0 z-[9999] bg-white dark:bg-[#05000a] flex flex-col items-center justify-center transition-colors">
@@ -757,14 +758,14 @@ import { TrustBadges } from "@/components/TrustBadges";
 import Image from "next/image";
 import PhoneBanner from "@/components/PhoneBanner";
 
-// 🔥 DYNAMIC IMPORTS (Optimized for Performance)
+// 🔥 DYNAMIC IMPORTS
 const VisualPartsFinder = dynamic(
   () => import("@/components/VisualPartsFinder"),
   {
     loading: () => (
       <div className="h-96 w-full bg-gray-100 dark:bg-white/5 rounded-[2rem] animate-pulse my-12" />
     ),
-    ssr: false, // క్లయింట్ లో మాత్రమే లోడ్ అవుతుంది, సర్వర్ లోడింగ్ బరువు తగ్గుతుంది
+    ssr: false,
   },
 );
 
@@ -772,7 +773,7 @@ const ReviewsCarousel = dynamic(() => import("@/components/ReviewsCarousel"), {
   loading: () => (
     <div className="h-64 w-full bg-gray-100 dark:bg-white/5 rounded-2xl animate-pulse my-8" />
   ),
-  ssr: false, // పేజీ అడుగున ఉంటుంది కాబట్టి లేజీ లోడ్ చేయడమే మంచిది
+  ssr: false,
 });
 
 const GarageSection = dynamic(() => import("@/components/GarageSection"), {
@@ -794,7 +795,6 @@ const WhyChooseUs = dynamic(() =>
   import("@/components/whyChooseUs").then((mod) => mod.WhyChooseUs),
 );
 
-// ప్రొడక్ట్ కార్డ్ ని కూడా లేజీ లోడ్ చేస్తున్నాం జావాస్క్రిప్ట్ బండిల్ సైజు తగ్గించడానికి
 const ProductCard = dynamic(
   () => import("@/components/ProductCard").then((mod) => mod.ProductCard),
   {
@@ -802,7 +802,7 @@ const ProductCard = dynamic(
   },
 );
 
-// --- INTERFACES & CONSTANTS ---
+// --- INTERFACES ---
 interface FlashSale {
   isActive: boolean;
   salePrice: number;
@@ -826,20 +826,6 @@ interface Product {
   discountPrice?: number;
   finalPrice?: number;
 }
-
-const COMPATIBLE_MODELS = [
-  "CRETA",
-  "VERNA",
-  "i20",
-  "VENUE",
-  "TUCSON",
-  "ALCAZAR",
-  "AURA",
-  "SANTRO",
-  "ELANTRA",
-  "EXTER",
-  "IONIQ 5",
-];
 
 const VISUAL_CATEGORIES = [
   {
@@ -902,16 +888,13 @@ export default function Home() {
   });
   const opacityText = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
-  // INITIAL LOAD SIMULATION
   useEffect(() => {
     const timer = setTimeout(() => setIsInitialLoad(false), 1500);
     return () => clearTimeout(timer);
   }, []);
 
-  // FETCH PRODUCTS
   useEffect(() => {
     if (!isInitialLoad) fetchProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitialLoad]);
 
   const fetchProducts = async () => {
@@ -1006,85 +989,83 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-pink-50 dark:from-[#0f0014] dark:via-[#1a0b2e] dark:to-[#05000a] text-slate-900 dark:text-white font-sans transition-colors duration-500 overflow-x-hidden">
-      {/* 🌌 GLOBAL BACKGROUND AMBIENCE */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-indigo-300/20 dark:bg-purple-600/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[20%] right-[-5%] w-[500px] h-[500px] bg-pink-300/20 dark:bg-pink-600/10 rounded-full blur-[100px]" />
+      <div className="fixed inset-0 pointer-events-none z-0 hidden md:block">
+        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-indigo-300/20 dark:bg-purple-600/10 rounded-full blur-[120px] transform-gpu" />
+        <div className="absolute bottom-[20%] right-[-5%] w-[500px] h-[500px] bg-pink-300/20 dark:bg-pink-600/10 rounded-full blur-[100px] transform-gpu" />
       </div>
+
       <PhoneBanner />
+
       <main className="relative z-10">
-        {/* ================= HERO SECTION ================= */}
+        {/* ================= HERO SECTION (PERFECTLY FIXED FOR MOBILE) ================= */}
+        {/* 🔥 FIX 1: Removed flex-col justify-end and min-h. Used a solid block approach. */}
         <section
           ref={heroRef}
-          className="relative w-full h-[100dvh] overflow-hidden bg-black"
+          className="relative w-full h-[100vh] lg:h-screen overflow-hidden bg-black block"
         >
           {/* ==============================
-          VIDEO LAYER (High Performance Optimized)
+          VIDEO & IMAGE LAYER
           ============================== */}
-          <div className="absolute inset-0 z-0">
-            {/* Desktop Image Cover */}
+          <div className="absolute inset-0 z-0 w-full h-full">
             <div className="hidden md:block absolute inset-0 z-0">
               <Image
                 src="/images/hyundai-hero.png"
                 alt="Hyundai Parts Desktop Background"
                 fill
                 priority
-                className="object-cover object-center opacity-70"
+                className="object-cover object-center opacity-50"
                 sizes="100vw"
-                quality={80}
               />
             </div>
 
-            {/* Mobile Image Cover */}
             <div className="block md:hidden absolute inset-0 z-0">
               <Image
                 src="/images/mobileHero.png"
                 alt="Hyundai Parts Mobile Background"
                 fill
                 priority
-                className="object-cover object-center opacity-70"
+                className="object-cover object-center opacity-50"
                 sizes="100vw"
-                quality={80}
               />
             </div>
 
-            {/* Desktop Video - FIXED PRELOAD AND ACCESSIBILITY */}
+            {/* Desktop Video */}
             <video
               autoPlay
               loop
               muted
               playsInline
-              preload="none"
-              aria-hidden="true"
-              className="hidden md:block w-full h-full object-cover object-center scale-105 relative z-10"
+              preload="auto"
+              className="hidden md:block absolute inset-0 w-full h-full object-cover object-center scale-[1.02] z-10 opacity-100"
             >
               <source src="/videos/Desktopvideo.mp4" type="video/mp4" />
             </video>
 
-            {/* Mobile Video - FIXED PRELOAD AND ACCESSIBILITY */}
+            {/* Mobile Video */}
+            {/* 🔥 FIX 2: Removed mix-blend-screen and made it fully opaque to hide the image behind it */}
             <video
               autoPlay
               loop
               muted
               playsInline
-              preload="none"
-              aria-hidden="true"
-              className="block md:hidden w-full h-full object-cover object-center scale-105 relative z-10"
+              preload="auto"
+              className="block md:hidden absolute inset-0 w-full h-full object-cover object-center z-10 opacity-100 scale-[1.02]"
             >
               <source src="/videos/Mobilevideo-small.mp4" type="video/mp4" />
             </video>
 
             {/* Overlays for Text Readability */}
-            <div className="absolute inset-0 bg-black/10 z-20 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-20 pointer-events-none" />
+            <div className="absolute inset-0 bg-black/30 z-20 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-full h-3/4 bg-gradient-to-t from-[#0f0014] via-black/50 to-transparent z-20 pointer-events-none" />
           </div>
 
           {/* ==============================
           TEXT CONTENT
           ============================== */}
+          {/* 🔥 FIX 3: Used absolute positioning at the bottom to lock it in place */}
           <motion.div
             style={{ opacity: opacityText }}
-            className="relative z-30 h-full flex flex-col justify-end items-start px-6 pb-12 md:px-16 md:pb-16"
+            className="absolute bottom-0 left-0 w-full z-30 px-6 pb-24 md:px-16 md:pb-20"
           >
             <div className="max-w-2xl">
               <motion.div
@@ -1103,9 +1084,9 @@ export default function Home() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="text-3xl md:text-5xl font-black tracking-tight text-white leading-tight drop-shadow-2xl"
+                className="text-4xl md:text-5xl lg:text-7xl font-black tracking-tight text-white leading-[1.1] drop-shadow-2xl"
               >
-                Genuine{" "}
+                Genuine <br className="md:hidden" />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-pink-400">
                   Performance
                 </span>
@@ -1115,16 +1096,14 @@ export default function Home() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="mt-3 text-sm md:text-base text-gray-200 font-medium max-w-md drop-shadow-lg"
+                className="mt-4 text-sm md:text-lg text-gray-200 font-medium max-w-md drop-shadow-lg"
               >
                 Precision engineered components. Safety assured.
               </motion.p>
             </div>
           </motion.div>
 
-          {/* ==============================
-          SCROLL INDICATOR
-          ============================== */}
+          {/* SCROLL INDICATOR */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -1140,9 +1119,9 @@ export default function Home() {
               className="group flex flex-col items-center justify-center gap-1"
               aria-label="Scroll to Garage Section"
             >
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/40 flex items-center justify-center bg-black/30 backdrop-blur-md group-hover:bg-white/20 transition-all duration-300 shadow-xl">
+              <div className="w-12 h-12 rounded-full border border-white/40 flex items-center justify-center bg-black/40 backdrop-blur-md group-hover:bg-white/20 transition-all duration-300 shadow-xl">
                 <ArrowDown
-                  size={18}
+                  size={20}
                   className="text-white group-hover:translate-y-1 transition-transform"
                 />
               </div>
@@ -1154,7 +1133,9 @@ export default function Home() {
         <TrustBadges />
 
         {/* ================= GARAGE SECTION ================= */}
-        <GarageSection />
+        <div id="garage-section">
+          <GarageSection />
+        </div>
 
         {/* ================= CATEGORIES ================= */}
         <section className="container mx-auto px-4 py-8 mb-5 md:mb-4">
@@ -1162,9 +1143,8 @@ export default function Home() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
               Shop by Category
             </h2>
-            {/* ADDED ARIA LABEL HERE */}
             <Link
-              href="#"
+              href="/categories"
               aria-label="View all categories"
               className="text-indigo-600 dark:text-pink-400 text-xs sm:text-sm font-bold uppercase tracking-wider hover:underline flex items-center gap-1 transition-all"
             >
@@ -1215,7 +1195,6 @@ export default function Home() {
           id="search-section"
           className="container mx-auto px-4 py-8 md:py-16"
         >
-          {/* --- Sticky Search Header --- */}
           <div className="sticky top-20 z-40 mb-12 max-w-5xl mx-auto">
             <div className="text-center mb-6">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
@@ -1230,7 +1209,6 @@ export default function Home() {
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-pink-600 rounded-[2rem] opacity-20 group-hover:opacity-40 blur-xl transition duration-500"></div>
               <div className="relative bg-white/80 dark:bg-[#1a0b2e]/90 backdrop-blur-2xl border border-white/60 dark:border-white/10 p-2 md:p-2.5 rounded-[1.8rem] shadow-2xl shadow-indigo-900/5 dark:shadow-black/50 flex flex-col md:flex-row gap-2 transition-all">
-                {/* --- Filter Tabs --- */}
                 <div className="flex p-1 bg-gray-100/80 dark:bg-white/5 rounded-2xl w-full md:w-auto shrink-0 overflow-x-auto no-scrollbar">
                   {[
                     { id: "keyword", label: "Keyword" },
@@ -1251,7 +1229,6 @@ export default function Home() {
                   ))}
                 </div>
 
-                {/* --- Search Input Area --- */}
                 <div className="relative flex-1 group/input bg-gray-50 dark:bg-black/20 md:bg-transparent md:dark:bg-transparent rounded-2xl md:rounded-none transition-colors flex items-center">
                   <button
                     onClick={handleSearch}
@@ -1300,7 +1277,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* --- Results Grid --- */}
           <motion.div
             id="products-grid"
             layout
@@ -1410,7 +1386,6 @@ export default function Home() {
   );
 }
 
-// 🔥 FIX: ADDED forwardRef TO SKELETON
 const ProductSkeleton = forwardRef<HTMLDivElement>((props, ref) => {
   return (
     <div
@@ -1430,7 +1405,6 @@ const ProductSkeleton = forwardRef<HTMLDivElement>((props, ref) => {
 });
 ProductSkeleton.displayName = "ProductSkeleton";
 
-// ⚡ LOADER
 function FullScreenLoader() {
   return (
     <div className="fixed inset-0 z-[9999] bg-white dark:bg-[#05000a] flex flex-col items-center justify-center transition-colors">
